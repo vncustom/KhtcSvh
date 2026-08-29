@@ -345,8 +345,16 @@ Tệp mở bằng trình xem nhúng của Drive, trang không in đường dẫn
 
 Đối tác quét mã QR không đăng nhập Google, nên tệp để riêng tư sẽ hiện màn hình
 *"Đăng nhập vào Tài khoản Google"* thay vì nội dung. Vì vậy khi bật ô *Đối tác xem được*,
-hệ thống tự đặt tệp trên Drive sang chế độ **ai có link cũng xem được**, đồng thời
-**chặn tải xuống, in và sao chép**. Tắt ô đó là tệp trở lại riêng tư ngay.
+hệ thống tự đặt tệp trên Drive sang chế độ **ai có link cũng xem được**.
+Tắt ô đó là tệp trở lại riêng tư ngay.
+
+Đối tác **xem và tải tệp về máy** được. Trên trang tra cứu, mỗi tệp có nút *Xem* mở
+trình xem nhúng và nút *Tải xuống*; cả hai đều được ghi vào nhật ký truy cập của phiếu,
+phân biệt rõ lượt xem với lượt tải.
+
+Muốn chỉ cho xem mà không cho tải, đặt tham số `DOI_TAC_DUOC_TAI` thành `TAT`
+ở **Quản trị ➜ Cấu hình**, rồi chạy `raSoatQuyenTep()` để áp lại cho các tệp đã chia sẻ.
+Khi đó Drive chặn cả tải xuống, in và sao chép.
 
 Đây là đánh đổi cần biết rõ: trong lúc ô được bật, ai có đường dẫn Drive của tệp đều xem
 được mà không cần qua phiếu chia sẻ. Cách giảm thiểu: chỉ bật cho tệp thật sự cần gửi

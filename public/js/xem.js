@@ -192,10 +192,15 @@ function veNoiDung(nd) {
   chu($('ndHetHan'), nd.het_han_phieu
     ? `Quyền truy cập này có hiệu lực đến ${ngayVn(nd.het_han_phieu)}.` : '');
 
-  veTep(nd.tep);
+  veTep(nd.tep, nd.duoc_tai);
 }
 
-function veTep(ds) {
+/** Ghi lại việc đối tác mở hay tải tệp. Ghi hỏng cũng không được cản việc xem. */
+function ghiLuot(viec, tenTep) {
+  goi('motep', { viec, ten_tep: tenTep }).catch(() => {});
+}
+
+function veTep(ds, duocTai) {
   chu($('ndSoTep'), ds.length
     ? `${ds.length} tệp được chia sẻ với đơn vị của bạn.`
     : 'Hồ sơ này chưa chia sẻ tệp nào.');
@@ -232,6 +237,21 @@ function veTep(ds) {
     xem.addEventListener('click', () => moTep(t));
     nut.append(xem);
 
+    if (duocTai && t.url_tai) {
+      // Dùng thẻ liên kết chứ không phải nút, để trình duyệt tự lo phần tải xuống.
+      const tai = document.createElement('a');
+      tai.className = 'nut-nho';
+      tai.style.textDecoration = 'none';
+      tai.href = t.url_tai;
+      tai.target = '_blank';
+      tai.rel = 'noopener';
+      tai.textContent = 'Tải xuống';
+      tai.addEventListener('click', () => {
+        ghiLuot('TAI_TEP', t.ten_hien_thi);
+      });
+      nut.append(tai);
+    }
+
     hang.append(icon, giua, nut);
     vung.append(hang);
   }
@@ -242,7 +262,7 @@ function veTep(ds) {
  * để người xem không chép được link mang đi nơi khác.
  */
 function moTep(t) {
-  goi('motep', { ten_tep: t.ten_hien_thi }).catch(() => { /* ghi nhật ký hỏng cũng không cản việc xem */ });
+  ghiLuot('MO_TEP', t.ten_hien_thi);
 
   const che = document.createElement('div');
   che.className = 'man-che';
@@ -263,7 +283,20 @@ function moTep(t) {
   x.type = 'button';
   x.textContent = '✕';
   x.setAttribute('aria-label', 'Đóng');
-  dau.append(h2, x);
+
+  if (t.url_tai) {
+    const tai = document.createElement('a');
+    tai.className = 'nut-nho';
+    tai.style.cssText = 'text-decoration:none;margin-left:auto';
+    tai.href = t.url_tai;
+    tai.target = '_blank';
+    tai.rel = 'noopener';
+    tai.textContent = 'Tải xuống';
+    tai.addEventListener('click', () => ghiLuot('TAI_TEP', t.ten_hien_thi));
+    dau.append(h2, tai, x);
+  } else {
+    dau.append(h2, x);
+  }
 
   const than = document.createElement('div');
   than.className = 'hop-thoai-than';

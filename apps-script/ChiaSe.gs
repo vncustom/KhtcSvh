@@ -409,6 +409,7 @@ function noiDungTheoPhieu_(p) {
     return ma;
   };
 
+  const duocTai = getCauHinh('DOI_TAC_DUOC_TAI', 'BAT') === 'BAT';
   const chon = String(p.pham_vi_tep || 'CHO_DOI_TAC');
   const tep = loc_('TEP_DINH_KEM', function (t) {
     if (String(t.ho_so_id) !== String(h.ho_so_id)) return false;
@@ -431,6 +432,7 @@ function noiDungTheoPhieu_(p) {
     mo_ta: h.mo_ta,
     ma_don_vi: h.ma_don_vi,
     het_han_phieu: p.het_han,
+    duoc_tai: duocTai,
     tep: tep.map(function (t) {
       return {
         file_id: t.file_id,
@@ -439,8 +441,8 @@ function noiDungTheoPhieu_(p) {
         ten_hien_thi: t.ten_hien_thi,
         dung_luong: Number(t.dung_luong || 0),
         mo_ta: t.mo_ta,
-        // Chỉ đưa địa chỉ nhúng, không đưa đường dẫn tệp gốc ra trang.
-        url_nhung: urlNhung_(t.drive_file_id)
+        url_nhung: urlNhung_(t.drive_file_id),
+        url_tai: duocTai ? urlTai_(t.drive_file_id) : ''
       };
     })
   };
@@ -448,6 +450,7 @@ function noiDungTheoPhieu_(p) {
 
 /** Ghi lại lượt đối tác mở tệp, để biết ai đã xem gì. */
 function ghiLuotMoTep_(payload, ctx) {
+  const viec = String(payload.viec || 'MO_TEP') === 'TAI_TEP' ? 'TAI_TEP' : 'MO_TEP';
   const phien = timMot_('PHIEN', 'token_hash', sha256Hex_(String(payload.phien_xem || '')));
   if (!phien || phien.trang_thai !== 'XEM_PHIEU') return { da_ghi: false };
 
@@ -455,7 +458,7 @@ function ghiLuotMoTep_(payload, ctx) {
   const p = timMot_('PHIEU_CHIA_SE', 'share_id', shareId);
   if (!p) return { da_ghi: false };
 
-  ghiLuot_(p, ctx, 'MO_TEP', String(payload.ten_tep || ''));
+  ghiLuot_(p, ctx, viec, String(payload.ten_tep || ''));
   return { da_ghi: true };
 }
 

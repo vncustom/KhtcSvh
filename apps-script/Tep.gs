@@ -355,8 +355,10 @@ function kiemTraLinkHangDem() {
  *
  * Đối tác quét mã QR không đăng nhập Google, nên tệp để riêng tư sẽ hiện màn hình
  * "Đăng nhập vào Tài khoản Google" thay vì nội dung. Bật cờ thì đặt tệp sang chế độ
- * ai có link cũng xem được, đồng thời chặn tải xuống, in và sao chép — người xem
- * chỉ đọc được qua trình xem nhúng.
+ * ai có link cũng xem được.
+ *
+ * Việc đối tác có tải tệp về máy được hay không do tham số DOI_TAC_DUOC_TAI quyết định:
+ * BAT thì cho tải, TAT thì chặn tải, in và sao chép — chỉ đọc được qua trình xem nhúng.
  *
  * Tệp dạng link ngoài nằm ở tài khoản Drive khác nên hệ thống không đổi quyền được;
  * quyền của chúng do bên kho video quyết định.
@@ -368,7 +370,7 @@ function dongBoQuyenTep_(t, choXem) {
     const f = DriveApp.getFileById(t.drive_file_id);
     if (choXem) {
       f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      chanTaiXuong_(t.drive_file_id, true);
+      chanTaiXuong_(t.drive_file_id, getCauHinh('DOI_TAC_DUOC_TAI', 'BAT') !== 'BAT');
     } else {
       f.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
     }
@@ -520,6 +522,13 @@ function urlXem_(driveFileId) {
 
 function urlNhung_(driveFileId) {
   return driveFileId ? 'https://drive.google.com/file/d/' + driveFileId + '/preview' : '';
+}
+
+/** Đường dẫn tải thẳng tệp về máy. Chỉ mở được khi tệp đang ở chế độ ai có link cũng xem. */
+function urlTai_(driveFileId) {
+  return driveFileId
+    ? 'https://drive.google.com/uc?export=download&id=' + driveFileId
+    : '';
 }
 
 function dinhDangDungLuong_(byte) {

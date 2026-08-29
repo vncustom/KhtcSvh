@@ -43,6 +43,8 @@ const CAU_HINH_MAC_DINH = [
     'Tên các đơn vị được gửi duyệt hộ hồ sơ của đơn vị khác, cách nhau bằng dấu chấm phẩy'],
   ['DON_VI_CHU_QUAN_DUOC_DUYET', 'BAT',
     'BAT cho phép đơn vị chủ quản tự duyệt hồ sơ của mình; TAT thì chỉ Ban KH-TC duyệt'],
+  ['DOI_TAC_DUOC_TAI', 'BAT',
+    'BAT cho phép đối tác tải tệp về máy; TAT thì chỉ xem được qua trình xem nhúng'],
   ['CHE_DO_KIEM_TRA', 'BAT', 'BAT cho phép trang kiểm tra Giai đoạn 0 chạy không cần đăng nhập. Đặt TAT khi chạy thật.'],
   ['QUOTA_MAIL_CANH_BAO', '20', 'Cảnh báo admin khi số email còn lại trong ngày thấp hơn mức này']
 ];
