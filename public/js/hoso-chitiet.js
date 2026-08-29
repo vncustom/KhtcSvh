@@ -7,9 +7,11 @@ import { dungKhung, bao, cho } from './khung.js';
 import { LOP_TRANG_THAI, HANH_DONG, VAI_TRO_DOI_TAC, maHoSoTuUrl, giaySangChu } from './hoso-chung.js';
 import { napTep } from './hoso-tep.js';
 import { napHopDong, datDonVi } from './hoso-hopdong.js';
+import { napChiaSe } from './hoso-chiase.js';
 
 const maHoSo = maHoSoTuUrl();
 let danhMuc = {};
+let danhSachDonVi = [];
 
 (async function batDau() {
   const me = await dungKhung({ trangHienTai: '/ho-so' });
@@ -22,12 +24,14 @@ let danhMuc = {};
 
   danhMuc = await api('layDanhMuc');
 
-  // Danh sách đơn vị dùng cho hộp thoại hợp đồng; đối tác không có quyền đọc.
+  // Danh sách đơn vị dùng cho hộp thoại hợp đồng và phiếu chia sẻ;
+  // tài khoản đối tác không có quyền đọc nên bỏ qua trong im lặng.
   try {
-    datDonVi(await api('danhSachDonViDayDu'));
+    danhSachDonVi = await api('danhSachDonViDayDu');
   } catch (e) {
-    datDonVi([]);
+    danhSachDonVi = [];
   }
+  datDonVi(danhSachDonVi);
 
   await nap();
 })();
@@ -98,6 +102,8 @@ function ve(d) {
   veThuMuc(h);
   napTep(h.ho_so_id);
   napHopDong(h.ho_so_id);
+  napChiaSe(h.ho_so_id, h.ten_chuong_trinh,
+    danhSachDonVi.filter((d) => d.loai === 'DOI_TAC'));
   veNhatKy(d.nhat_ky);
   veHanhDong(d.duoc_lam, h);
 }

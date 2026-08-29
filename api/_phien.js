@@ -1,11 +1,12 @@
 /**
- * api/_phien.js — Ba cookie httpOnly của hệ thống.
+ * api/_phien.js — Bốn cookie httpOnly của hệ thống.
  *
  *   htv_phien  token phiên đăng nhập, mặc định 12 giờ
  *   htv_tam    phiên tạm giữa bước nhập mật khẩu và bước nhập OTP, 10 phút
  *   htv_tb     dấu thiết bị đã ghi nhớ, 30 ngày
+ *   htv_xem    phiên xem của đối tác sau khi xác thực phiếu chia sẻ, 30 phút
  *
- * Cả ba đều được ký bằng HMAC-SHA256 và không đọc được từ JavaScript trên trang,
+ * Cả bốn đều được ký bằng HMAC-SHA256 và không đọc được từ JavaScript trên trang,
  * nên một lỗ hổng XSS ở giao diện không kéo theo mất phiên.
  */
 
@@ -14,6 +15,7 @@ import crypto from 'node:crypto';
 export const COOKIE_PHIEN = 'htv_phien';
 export const COOKIE_TAM = 'htv_tam';
 export const COOKIE_THIET_BI = 'htv_tb';
+export const COOKIE_XEM = 'htv_xem';        // phiên xem của đối tác sau khi quét mã QR
 
 const BI_MAT = process.env.SESSION_SECRET || '';
 

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tra cứu hồ sơ chương trình — HTV</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+<style>
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  .giua { flex: 1; display: grid; place-items: start center; padding: 32px 20px; width: 100%; }
+  .hop { width: 100%; max-width: 460px; }
+  .rong { width: 100%; max-width: 880px; }
+  .o-ma { display: flex; gap: 8px; justify-content: space-between; margin-bottom: 6px; }
+  .o-ma input {
+    width: 100%; aspect-ratio: 3 / 4; text-align: center;
+    font-family: var(--font-mono); font-size: 22px; font-weight: 500;
+    border: 1px solid var(--duong); border-radius: 6px; background: var(--mat); color: var(--chu);
+  }
+  .o-ma input:focus { border-color: var(--navy-500); outline: none; box-shadow: 0 0 0 3px rgba(34,84,143,.12); }
+  .dong-nho { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 18px; }
+  .lien-ket { background: none; border: 0; padding: 0; font: inherit; font-size: 13px;
+              color: var(--navy-500); cursor: pointer; text-decoration: underline; }
+  .lien-ket:disabled { color: var(--chu-mo); cursor: default; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính · Cổng tra cứu dành cho đối tác</span>
+    </div>
+  </div>
+</header>
+
+<main class="giua">
+
+  <!-- Đang kiểm tra đường dẫn -->
+  <div id="buocTai" class="hop">
+    <div class="the" style="text-align:center;padding:34px 20px">
+      <div class="quay" style="width:22px;height:22px;margin:0 auto 12px;
+           border-color:rgba(13,39,72,.2);border-top-color:var(--navy-800)"></div>
+      <div style="font-size:14px;color:var(--chu-nhat)">Đang kiểm tra đường dẫn…</div>
+    </div>
+  </div>
+
+  <!-- Đường dẫn không dùng được -->
+  <div id="buocLoi" class="hop an">
+    <div class="the">
+      <h1 style="margin:0 0 8px;font-size:19px;font-weight:600;color:var(--navy-800)">
+        Không mở được hồ sơ
+      </h1>
+      <p id="lyDoLoi" style="margin:0 0 16px;font-size:14px;color:var(--chu-nhat)"></p>
+      <p style="margin:0;font-size:13.5px;color:var(--chu-mo)">
+        Nếu cần tiếp tục truy cập, vui lòng liên hệ Ban Kế hoạch – Tài chính
+        để được cấp phiếu chia sẻ mới.
+      </p>
+    </div>
+  </div>
+
+  <!-- Xác thực -->
+  <div id="buocXacThuc" class="hop an">
+    <div class="the">
+      <span class="nhan">Hồ sơ đối chiếu</span>
+      <h1 id="tenChuongTrinh" style="margin:0 0 4px;font-size:19px;font-weight:600;color:var(--navy-800)"></h1>
+      <p id="maHoSo" style="margin:0 0 20px;font-family:var(--font-mono);font-size:12.5px;color:var(--chu-mo)"></p>
+
+      <div id="baoLoi" class="thong-bao loi an" style="margin-bottom:14px"></div>
+      <div id="baoTin" class="thong-bao tot an" style="margin-bottom:14px"></div>
+
+      <!-- Xác thực bằng mã gửi email -->
+      <div id="cachOtp" class="an">
+        <p style="margin:0 0 16px;font-size:14px;color:var(--chu-nhat)">
+          Để xem nội dung, hãy nhận mã xác thực gửi tới hòm thư
+          <strong id="emailChe"></strong>.
+        </p>
+        <button class="nut nut-chinh" id="nutGuiMa" type="button" style="width:100%">
+          Gửi mã xác thực
+        </button>
+      </div>
+
+      <!-- Nhập mã -->
+      <form id="formMa" class="an" novalidate>
+        <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">
+          <span id="nhanMa">Nhập mã 6 chữ số</span>
+        </label>
+        <div class="o-ma" id="oMa">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 1">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 2">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 3">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 4">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 5">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 6">
+        </div>
+        <div class="dong-nho">
+          <span id="dongHo" style="color:var(--chu-nhat)"></span>
+          <button type="button" class="lien-ket an" id="nutGuiLai">Gửi lại mã</button>
+        </div>
+        <button class="nut nut-chinh" type="submit" style="width:100%">Xem hồ sơ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Nội dung hồ sơ -->
+  <div id="buocNoiDung" class="rong an">
+    <div class="the" style="margin-bottom:16px">
+      <span class="nhan">Hồ sơ chương trình</span>
+      <h1 id="ndTen" style="margin:0 0 6px;font-size:21px;font-weight:600;color:var(--navy-800)"></h1>
+      <div id="ndMa" style="font-family:var(--font-mono);font-size:12.5px;color:var(--chu-mo)"></div>
+      <div class="bang-bao" style="margin-top:16px">
+        <table class="bang-truong"><tbody id="ndBang"></tbody></table>
+      </div>
+      <div id="ndMoTa" style="margin-top:16px;white-space:pre-wrap;font-size:14px"></div>
+    </div>
+
+    <div class="the">
+      <h2>Tài liệu &amp; video</h2>
+      <p class="mo-ta" id="ndSoTep"></p>
+      <div id="ndTep"></div>
+    </div>
+
+    <p id="ndHetHan" style="margin:16px 0 0;font-size:12.5px;color:var(--chu-mo);text-align:center"></p>
+  </div>
+
+</main>
+
+<footer class="chan" style="text-align:center">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<div id="vungXem"></div>
+
+<script type="module" src="/js/xem.js"></script>
+</body>
+</html>

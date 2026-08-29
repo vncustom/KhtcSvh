@@ -4,7 +4,7 @@ Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Ch
 
 Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ liệu trong Google Sheet · tài liệu trên Google Drive.
 
-**Trạng thái: Giai đoạn 4A** — hồ sơ, quy trình duyệt, tệp đính kèm, nhập từ Excel và hợp đồng – thanh toán đã hoạt động. Phiếu chia sẻ và mã QR sẽ có ở Giai đoạn 4B.
+**Trạng thái: Giai đoạn 4 hoàn tất** — hồ sơ, quy trình duyệt, tệp đính kèm, nhập từ Excel, hợp đồng – thanh toán, và phiếu chia sẻ kèm mã QR đều đã hoạt động.
 
 ---
 
@@ -19,6 +19,7 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   ho-so-sua.html      Biểu mẫu thêm và sửa hồ sơ
   nhap-excel.html     Nhập nhiều hồ sơ từ phiếu Excel của đơn vị
   hop-dong.html       Hợp đồng toàn đài: lọc, cảnh báo hạn, tiến độ chi trả
+  xem.html            Trang tra cứu công khai cho đối tác quét mã QR
   quan-tri.html       Người dùng · Đơn vị · Cấu hình · Nhật ký
   kiem-tra.html       Trang kiểm tra đường truyền của Giai đoạn 0
   css/app.css         Bảng màu navy và các thành phần dùng chung
@@ -28,9 +29,11 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   js/dangnhap.js      js/app.js            js/quantri.js       js/kiemtra.js
   js/hoso-danhsach.js js/hoso-chitiet.js   js/hoso-sua.js      js/hoso-tep.js
   js/nhap-excel.js    js/hoso-hopdong.js   js/hopdong-danhsach.js
+  js/hoso-chiase.js   js/xem.js            js/qr.js
 
 api/               Tuyến trung gian chạy trên Vercel (Node)
   goi.js             Cửa chung cho mọi action nghiệp vụ
+  chiase.js          Cửa công khai cho đối tác quét mã QR
   dangnhap.js        Bước 1: kiểm mật khẩu, đặt cookie
   otp.js             Bước 2: xác thực mã, gửi lại mã
   dangxuat.js        quenthietbi.js
@@ -54,6 +57,7 @@ apps-script/       Mã chạy trên Google Apps Script
   Tep.gs             Tệp đính kèm: tải lên, dán link, kiểm tra link
   NhapExcel.gs       Đọc phiếu Excel và tạo hồ sơ hàng loạt
   HopDong.gs         Hợp đồng, phụ lục, biên bản và các đợt thanh toán
+  ChiaSe.gs          Phiếu chia sẻ, xác thực đối tác, nhật ký truy cập
   Setup.gs           Khởi tạo bảng và dữ liệu mẫu
   Router.gs          Điểm vào doPost
 
@@ -70,7 +74,7 @@ scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
 
 1. Mở [script.google.com](https://script.google.com) **bằng tài khoản Google có gói 5 TB** (tài khoản này sẽ sở hữu toàn bộ tệp Drive và hạn mức email).
 2. Bấm **Dự án mới**. Đặt tên: `HTV KHTC API`.
-3. Tạo đủ 17 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
+3. Tạo đủ 18 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
    Trong trình soạn thảo, dấu `.gs` được thêm tự động — chỉ cần gõ tên `Schema`, `Config`, …
 4. Mở **Project Settings** ➜ tích **Show "appsscript.json" manifest file**, rồi dán nội dung
    `apps-script/appsscript.json` đè lên file manifest.
@@ -312,8 +316,47 @@ giá trị không âm.
 
 ---
 
+## Phiếu chia sẻ cho đối tác
+
+Đây là phần thay thế cơ chế mã PIN tĩnh của bản demo. Mở thẻ **Chia sẻ cho đối tác**
+trong trang chi tiết hồ sơ.
+
+**Cách hoạt động.** Mỗi đối tác được cấp một phiếu riêng, gồm token ngẫu nhiên 128 bit
+mà hệ thống chỉ lưu bản băm, hạn hiệu lực, giới hạn lượt xem và nút thu hồi. Mã QR in lên
+hợp đồng chứa đường dẫn `…/xem?t=<token>`. Quét mã chỉ mở được màn hình xác thực,
+chưa thấy nội dung gì.
+
+**Hai cách xác thực,** chọn khi cấp phiếu:
+
+| Cách | Khi nào dùng |
+|---|---|
+| Gửi mã về email đối tác | Mặc định. Không có mã nào tồn tại sẵn để lộ — bản photo hợp đồng lọt ra ngoài cũng vô dụng. |
+| Cấp mã PIN riêng cho phiếu | Khi đối tác không có email ổn định. PIN sinh riêng từng phiếu, gửi qua kênh tách biệt với hợp đồng. |
+
+**Token và mã PIN chỉ hiện đúng một lần** ngay sau khi cấp, vì hệ thống chỉ giữ bản băm.
+Màn hình cấp phiếu kèm luôn mã QR, nút sao chép đường dẫn và nút in phiếu để bàn giao ngay.
+
+**Đối tác chỉ thấy tệp đã đánh dấu** *Đối tác xem được* ở mục Tài liệu đính kèm.
+Tệp mở bằng trình xem nhúng của Drive, trang không in đường dẫn tệp gốc.
+
+**Theo dõi và thu hồi.** Mỗi lần xác thực hay mở tệp đều ghi lại thời gian, địa chỉ IP
+và kết quả. Nhập sai 5 lần thì phiếu tự khoá 15 phút. Bấm Thu hồi là cắt luôn mọi phiên
+xem đang mở.
+
+### Về bộ sinh mã QR
+
+Mã QR được sinh ngay trong trình duyệt bằng `public/js/qr.js` — viết tay, không phụ thuộc
+thư viện ngoài. Lý do không gọi dịch vụ sinh QR trên mạng: nội dung cần mã hoá chính là
+đường dẫn có token, gửi nó sang máy chủ bên thứ ba là làm rò rỉ đúng thứ mà phiếu
+đang bảo vệ.
+
+Bộ sinh hỗ trợ chế độ byte (UTF-8), phiên bản 1–15, bốn mức sửa lỗi. Đã đối chiếu với
+thư viện `qrcode` chuẩn (44 trường hợp khớp tuyệt đối từng ô) và giải mã ngược bằng
+`jsQR` (48/48 lượt đọc ra đúng chuỗi gốc).
+
+---
+
 ## Giai đoạn tiếp theo
 
-**Giai đoạn 4B — Phiếu chia sẻ và mã QR.** Cấp phiếu cho từng đối tác kèm hạn dùng
-và phạm vi tệp; sinh mã QR để in lên hợp đồng; trang tra cứu công khai xác thực bằng
-OTP gửi email hoặc PIN động; theo dõi lượt truy cập và thu hồi phiếu tức thì.
+**Giai đoạn 5 — Báo cáo và bàn giao.** Xuất Excel và PDF, báo cáo theo đơn vị và theo kênh;
+kiểm thử phân quyền và bảo mật; tài liệu hướng dẫn cho ba nhóm người dùng.

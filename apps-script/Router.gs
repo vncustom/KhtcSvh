@@ -8,7 +8,9 @@
 /** Action không cần đăng nhập. */
 const ACTION_CONG_KHAI = [
   'ping', 'dangNhap', 'xacThucOtp', 'guiLaiOtp',
-  'xemHoSoTheoPhieu', 'guiMaChiaSe'
+  // Bốn action dưới đây phục vụ đối tác quét mã QR, không có tài khoản trong hệ thống.
+  // Mỗi action tự kiểm tra token của phiếu chia sẻ.
+  'xemPhieu', 'guiMaChiaSe', 'xacThucPhieu', 'noiDungPhieu', 'ghiLuotMoTep'
 ];
 
 /**
@@ -204,7 +206,20 @@ const ACTIONS = {
   luuHopDong: luuHopDong_,
   xoaHopDong: xoaHopDong_,
   luuThanhToan: luuThanhToan_,
-  xoaThanhToan: xoaThanhToan_
+  xoaThanhToan: xoaThanhToan_,
+
+  /* ----- Giai đoạn 4B: phiếu chia sẻ ----- */
+
+  capPhieuChiaSe: capPhieuChiaSe_,
+  danhSachPhieu: danhSachPhieu_,
+  thuHoiPhieu: thuHoiPhieu_,
+
+  /* Bốn action công khai cho đối tác quét mã QR */
+  xemPhieu: xemPhieu_,
+  guiMaChiaSe: guiMaChiaSe_,
+  xacThucPhieu: xacThucPhieu_,
+  noiDungPhieu: noiDungPhieu_,
+  ghiLuotMoTep: ghiLuotMoTep_
 };
 
 /** Xác thực phiên đăng nhập từ token trong cookie. */
