@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau khong-in">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <!-- Đầu trang, chỉ hiện khi in -->
+  <div class="dau-in chi-in">
+    <div class="dai">Đài Phát thanh - Truyền hình TP. Hồ Chí Minh</div>
+    <div class="ban">Ban Kế hoạch – Tài chính</div>
+    <h1>Báo cáo hồ sơ chương trình</h1>
+    <div class="khoang" id="khoangIn"></div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:18px"
+       class="khong-in">
+    <h1 style="margin:0;font-size:22px;font-weight:600;color:var(--navy-800)">Báo cáo</h1>
+    <span id="tomTat" style="font-size:13.5px;color:var(--chu-nhat)"></span>
+    <div class="hang-nut" style="margin-left:auto">
+      <button class="nut nut-phu" id="nutIn" type="button">In / Lưu PDF</button>
+      <button class="nut nut-chinh" id="nutXuat" type="button">Xuất Excel</button>
+    </div>
+  </div>
+
+  <div class="the khong-in" style="margin-bottom:18px;padding:14px 16px">
+    <div class="luoi" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;
+         align-items:end">
+      <div class="truong" style="margin:0">
+        <label for="fTuNgay">Phát sóng từ ngày</label>
+        <input class="o-nhap" id="fTuNgay" type="date">
+      </div>
+      <div class="truong" style="margin:0">
+        <label for="fDenNgay">Đến ngày</label>
+        <input class="o-nhap" id="fDenNgay" type="date">
+      </div>
+      <div class="truong" style="margin:0">
+        <label for="fDonVi">Đơn vị chủ quản</label>
+        <select class="o-nhap" id="fDonVi"><option value="">Tất cả đơn vị</option></select>
+      </div>
+      <button class="nut nut-phu" id="nutXoaLoc" type="button">Bỏ lọc</button>
+    </div>
+    <div class="hang-nut" style="margin-top:12px" id="locNhanhKy"></div>
+  </div>
+
+  <section class="luoi c4" id="oSoLieu" style="margin-bottom:20px"></section>
+
+  <div class="luoi c2" style="align-items:start">
+    <section class="the">
+      <h2>Theo đơn vị chủ quản</h2>
+      <div class="bang-bao"><table>
+        <thead><tr><th>Đơn vị</th><th>Hồ sơ</th><th>Đã duyệt</th><th>Thời lượng</th></tr></thead>
+        <tbody id="bangDonVi"></tbody>
+      </table></div>
+    </section>
+
+    <section class="the">
+      <h2>Theo kênh phát sóng</h2>
+      <div class="bang-bao"><table>
+        <thead><tr><th>Kênh</th><th>Hồ sơ</th><th>Đã duyệt</th><th>Thời lượng</th></tr></thead>
+        <tbody id="bangKenh"></tbody>
+      </table></div>
+    </section>
+
+    <section class="the">
+      <h2>Theo thể loại</h2>
+      <div class="bang-bao"><table>
+        <thead><tr><th>Thể loại</th><th>Hồ sơ</th><th>Đã duyệt</th><th>Thời lượng</th></tr></thead>
+        <tbody id="bangTheLoai"></tbody>
+      </table></div>
+    </section>
+
+    <section class="the">
+      <h2>Theo tháng phát sóng</h2>
+      <div class="bang-bao"><table>
+        <thead><tr><th>Tháng</th><th>Hồ sơ</th><th>Đã duyệt</th><th>Thời lượng</th></tr></thead>
+        <tbody id="bangThang"></tbody>
+      </table></div>
+    </section>
+
+    <section class="the an" id="khoiHopDong" style="grid-column:1/-1">
+      <h2>Hợp đồng theo đơn vị</h2>
+      <p class="mo-ta" id="tomTatHopDong"></p>
+      <div class="bang-bao"><table>
+        <thead><tr><th>Đơn vị</th><th>Số hợp đồng</th><th>Giá trị</th>
+          <th>Đã thanh toán</th><th>Còn lại</th><th>Tiến độ</th></tr></thead>
+        <tbody id="bangHopDong"></tbody>
+      </table></div>
+    </section>
+  </div>
+
+  <p id="lapLuc" style="margin:20px 0 0;font-size:12.5px;color:var(--chu-mo)"></p>
+
+</main>
+
+<footer class="chan khong-in">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<script type="module" src="/js/bao-cao.js"></script>
+</body>
+</html>

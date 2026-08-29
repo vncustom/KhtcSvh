@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hướng dẫn sử dụng — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+<style>
+  .hd-noi h3 { font-size: 15px; margin: 22px 0 6px; color: var(--navy-800); }
+  .hd-noi h3:first-child { margin-top: 0; }
+  .hd-noi p, .hd-noi li { font-size: 14px; max-width: 70ch; }
+  .hd-noi ol, .hd-noi ul { padding-left: 20px; margin: 0 0 12px; }
+  .hd-noi li { margin-bottom: 5px; }
+  .hd-noi p { margin: 0 0 12px; }
+  kbd {
+    font-family: var(--font-mono); font-size: 12px; background: var(--mat-2);
+    border: 1px solid var(--duong); border-bottom-width: 2px;
+    border-radius: 4px; padding: 1px 6px;
+  }
+</style>
+</head>
+<body>
+
+<header class="thanh-dau khong-in">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung" style="max-width:900px">
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+    <h1 style="margin:0;font-size:22px;font-weight:600;color:var(--navy-800)">Hướng dẫn sử dụng</h1>
+    <button class="nut nut-phu khong-in" id="nutIn" type="button" style="margin-left:auto">
+      In / Lưu PDF
+    </button>
+  </div>
+
+  <div class="thanh-the khong-in" id="thanhThe" role="tablist"></div>
+
+  <!-- Đơn vị chủ quản -->
+  <section id="mucDonVi" class="the hd-noi muc an">
+    <h3>Bạn làm gì trên hệ thống</h3>
+    <p>
+      Đơn vị chủ quản tạo hồ sơ cho chương trình của mình, đính kèm tài liệu và link video,
+      rồi gửi Ban Kế hoạch – Tài chính duyệt.
+    </p>
+
+    <h3>Tạo một hồ sơ</h3>
+    <ol>
+      <li>Vào <strong>Hồ sơ chương trình ➜ Tạo hồ sơ mới</strong>.</li>
+      <li>Điền tên chương trình và thời lượng — hai ô bắt buộc.
+        Thời lượng nhập theo dạng phút:giây, ví dụ <kbd>13:44</kbd>.</li>
+      <li>Ở mục <strong>Tài liệu &amp; video</strong>, chọn sẵn tệp và dán link video ngay.
+        Không phải lưu xong rồi quay lại.</li>
+      <li>Bấm <strong>Lưu hồ sơ</strong>. Hồ sơ ở trạng thái <em>Nháp</em>,
+        chỉ đơn vị bạn nhìn thấy.</li>
+      <li>Kiểm tra lại rồi bấm <strong>Gửi duyệt</strong>.</li>
+    </ol>
+
+    <h3>Nhập nhiều hồ sơ cùng lúc</h3>
+    <p>
+      Nếu đã có phiếu yêu cầu lưu file dạng Excel, vào <strong>Nhập từ Excel</strong>,
+      kéo phiếu vào, đối chiếu từng dòng rồi bấm tạo. Hệ thống tự nhận cột theo tên
+      ở dòng tiêu đề, nên thứ tự cột thế nào cũng được. Cột <strong>LINK</strong> được
+      hiểu là link video.
+    </p>
+
+    <h3>Hồ sơ bị trả lại</h3>
+    <p>
+      Ban Kế hoạch – Tài chính trả lại thì bạn nhận email kèm lý do, và hồ sơ quay về
+      <em>Nháp</em>. Lý do cũng hiện ngay đầu trang hồ sơ. Sửa xong thì gửi duyệt lại.
+    </p>
+
+    <h3>Sửa hồ sơ đã duyệt</h3>
+    <p>
+      Sửa được, nhưng hồ sơ sẽ tự quay lại <em>Chờ duyệt</em> và cần duyệt lần nữa.
+      Biểu mẫu báo trước điều này trước khi bạn bấm lưu.
+    </p>
+  </section>
+
+  <!-- Ban KH-TC -->
+  <section id="mucKhtc" class="the hd-noi muc an">
+    <h3>Bạn làm gì trên hệ thống</h3>
+    <p>
+      Ban Kế hoạch – Tài chính duyệt hồ sơ toàn đài, quản lý hợp đồng và các đợt thanh toán,
+      và cấp phiếu chia sẻ cho đối tác.
+    </p>
+
+    <h3>Duyệt hồ sơ</h3>
+    <ol>
+      <li>Bảng điều khiển nhắc <em>“Có N hồ sơ đang chờ bạn duyệt”</em> — bấm <strong>Xem ngay</strong>.</li>
+      <li>Mở từng hồ sơ, kiểm tra thông tin và tài liệu đính kèm.</li>
+      <li>Bấm <strong>Duyệt hồ sơ</strong>, hoặc <strong>Trả lại</strong> kèm lý do.
+        Lý do được gửi email cho đơn vị chủ quản và ghi vào nhật ký hồ sơ.</li>
+    </ol>
+
+    <h3>Hợp đồng và thanh toán</h3>
+    <p>
+      Mở hồ sơ, xuống thẻ <strong>Hợp đồng &amp; thanh toán</strong> để thêm hợp đồng.
+      Bấm <strong>Đợt thanh toán</strong> trên mỗi hợp đồng để chia đợt và đánh dấu đã chi trả.
+    </p>
+    <ul>
+      <li>Số hợp đồng phải là duy nhất trong toàn hệ thống.</li>
+      <li>Đánh dấu <em>Đã thanh toán</em> thì bắt buộc điền ngày thực tế.</li>
+      <li>Hợp đồng đã có đợt chi trả thì không xoá được — chuyển sang <em>Đã huỷ</em> thay vì xoá.</li>
+      <li>Bảng điều khiển tự nhắc hợp đồng sắp hết hạn và đợt thanh toán đến hạn, ngưỡng 30 ngày.</li>
+    </ul>
+
+    <h3>Cấp phiếu chia sẻ cho đối tác</h3>
+    <ol>
+      <li>Hồ sơ phải ở trạng thái <em>Đã duyệt</em>.</li>
+      <li>Ở mục <strong>Tài liệu đính kèm</strong>, tích <em>Đối tác xem được</em> cho những tệp
+        muốn gửi. Ô này được tích sẵn khi tải tệp lên.</li>
+      <li>Xuống thẻ <strong>Chia sẻ cho đối tác</strong>, bấm <strong>Cấp phiếu chia sẻ</strong>.</li>
+      <li>Chọn đối tác, cách xác thực và hạn hiệu lực.</li>
+      <li>Bấm <strong>In phiếu QR</strong> để dán vào hợp đồng giấy.</li>
+    </ol>
+    <p>
+      Cần in lại hoặc gửi lại đường dẫn thì bấm <strong>Xem phiếu</strong> trên phiếu đó.
+      Bấm <strong>Lượt truy cập</strong> để biết đối tác đã xem gì, lúc nào.
+      Bấm <strong>Thu hồi</strong> là cắt quyền ngay, kể cả phiên đang mở.
+    </p>
+
+    <h3>Báo cáo</h3>
+    <p>
+      Mục <strong>Báo cáo</strong> tổng hợp theo đơn vị, kênh, thể loại và tháng phát sóng.
+      Chọn khoảng thời gian rồi bấm <strong>Xuất Excel</strong> hoặc <strong>In / Lưu PDF</strong>.
+      Trang danh sách hồ sơ cũng có nút <strong>Xuất Excel</strong> theo đúng bộ lọc đang xem.
+    </p>
+  </section>
+
+  <!-- Quản trị -->
+  <section id="mucAdmin" class="the hd-noi muc an">
+    <h3>Việc cần làm ngay sau khi triển khai</h3>
+    <ol>
+      <li>Vào <strong>Quản trị ➜ Cấu hình</strong>, đặt <strong>thư mục lưu trữ trên Drive</strong>.
+        Chưa có thư mục thì không tải tệp lên được.</li>
+      <li>Đặt <code>CHE_DO_KIEM_TRA</code> thành <code>TAT</code> khi bắt đầu dùng thật.
+        Bảng điều khiển sẽ nhắc nếu bạn quên.</li>
+      <li>Sửa email của từng đơn vị và từng tài khoản — mặc định đang dùng chung một email
+        để thử nghiệm.</li>
+    </ol>
+
+    <h3>Tài khoản và phân quyền</h3>
+    <p>Năm vai trò, quyền do máy chủ quyết định chứ không phải giao diện ẩn nút:</p>
+    <ul>
+      <li><strong>Quản trị</strong> — toàn quyền, kể cả cấu hình và quản lý người dùng.</li>
+      <li><strong>Ban Kế hoạch – Tài chính</strong> — mọi hồ sơ, duyệt, hợp đồng, chia sẻ.</li>
+      <li><strong>Đơn vị chủ quản</strong> — hồ sơ của đơn vị mình.</li>
+      <li><strong>Đối tác</strong> — hồ sơ đã duyệt được gán cho mình.</li>
+      <li><strong>Khách quét QR</strong> — một hồ sơ, trong phạm vi phiếu chia sẻ.</li>
+    </ul>
+    <p>
+      Đặt lại mật khẩu thì hệ thống sinh mật khẩu tạm và gửi email; mật khẩu cũng hiện
+      một lần trên màn hình để bàn giao trực tiếp khi cần. Không ai xem được mật khẩu
+      của người khác — bảng dữ liệu chỉ lưu bản băm.
+    </p>
+
+    <h3>Trần 100 email mỗi ngày</h3>
+    <p>
+      Tài khoản Gmail cá nhân chỉ gửi được 100 thư/ngày qua Apps Script; gói Google One
+      không nâng con số này. Cách giữ cho đủ dùng:
+    </p>
+    <ul>
+      <li>Khuyên mọi người tích <em>Ghi nhớ máy này trong 30 ngày</em> khi đăng nhập.</li>
+      <li>Với đối tác, ưu tiên cấp phiếu dùng <strong>PIN</strong> thay vì gửi mã email.</li>
+      <li>Theo dõi số email còn lại ở <strong>Quản trị ➜ Cấu hình</strong>.</li>
+      <li>Hết quota thì tạm đặt <code>bat_2fa</code> của tài khoản cần dùng thành
+        <code>FALSE</code> ngay trong tab <code>NGUOI_DUNG</code>.</li>
+    </ul>
+
+    <h3>Việc nên đặt lịch chạy tự động</h3>
+    <p>
+      Trong trình soạn thảo Apps Script, mở <strong>Triggers</strong> và đặt lịch chạy đêm cho:
+    </p>
+    <ul>
+      <li><code>kiemTraLinkHangDem</code> — phát hiện link video hỏng ở kho 20 TB.</li>
+      <li><code>donDepPhienHetHan</code> — dọn phiên, mã OTP và phiếu chia sẻ đã hết hạn.</li>
+    </ul>
+
+    <h3>Những điều cần nhớ về an toàn dữ liệu</h3>
+    <ul>
+      <li><strong>File Google Sheet là cửa sau.</strong> Ai mở được file là sửa được dữ liệu,
+        vượt qua mọi kiểm tra của ứng dụng. Chỉ chia sẻ cho tài khoản chạy hệ thống
+        và một người dự phòng.</li>
+      <li><strong>Tệp bật <em>Đối tác xem được</em> nằm ở chế độ ai có link cũng xem.</strong>
+        Tắt ô đó khi xong việc.</li>
+      <li><strong>Video ở kho 20 TB không được phiếu chia sẻ bảo vệ,</strong> vì để chế độ
+        link công khai. Video chưa phát sóng nên đánh dấu <em>nhạy cảm</em> và để riêng tư
+        ở kho video.</li>
+      <li><strong>Sao lưu.</strong> Nên đặt lịch tự sao chép file Sheet sang thư mục sao lưu
+        mỗi đêm.</li>
+    </ul>
+  </section>
+
+  <!-- Đối tác -->
+  <section id="mucDoiTac" class="the hd-noi muc an">
+    <h3>Nhận hồ sơ qua mã QR</h3>
+    <ol>
+      <li>Quét mã QR trên phiếu đính kèm hợp đồng bằng máy ảnh điện thoại.</li>
+      <li>Trang tra cứu hiện tên chương trình và mã hồ sơ để bạn đối chiếu.</li>
+      <li>Bấm <strong>Gửi mã xác thực</strong> — mã 6 số về hòm thư đơn vị bạn đã đăng ký.
+        Nếu Ban Kế hoạch – Tài chính cấp mã PIN riêng thì nhập thẳng mã đó.</li>
+      <li>Nhập mã để xem hồ sơ, tài liệu và video.</li>
+    </ol>
+
+    <h3>Xem và tải tài liệu</h3>
+    <p>
+      Mỗi tệp có nút <strong>Xem</strong> để mở ngay trên trang, và nút
+      <strong>Tải xuống</strong> để lưu về máy.
+    </p>
+
+    <h3>Khi không mở được</h3>
+    <ul>
+      <li><em>Phiếu đã hết hạn</em> hoặc <em>đã bị thu hồi</em> — liên hệ Ban Kế hoạch – Tài chính
+        để được cấp phiếu mới.</li>
+      <li><em>Nhập sai quá 5 lần</em> — phiếu tạm khoá 15 phút, sau đó thử lại.</li>
+      <li>Không nhận được mã — kiểm tra hộp thư rác, hoặc hỏi lại địa chỉ email
+        đơn vị bạn đã đăng ký với Ban.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="chan khong-in">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<script type="module" src="/js/huong-dan.js"></script>
+</body>
+</html>

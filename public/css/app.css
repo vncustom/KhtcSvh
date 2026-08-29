@@ -859,3 +859,69 @@ a.thanh-do:hover .thanh-nhan span:first-child { color: var(--navy-700); }
 .moc-gap:last-child { border-bottom: 0; }
 .moc-gap:hover { background: var(--nen); }
 .moc-gap .trang-thai { margin-left: auto; flex: none; }
+
+/* ---------- Bản in ---------- */
+
+.chi-in { display: none; }
+
+.dau-in {
+  text-align: center;
+  border-bottom: 2px solid var(--navy-800);
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.dau-in .dai {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.dau-in .ban {
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--chu-nhat);
+}
+
+.dau-in h1 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 10px 0 4px;
+  color: var(--navy-800);
+}
+
+.dau-in .khoang { font-size: 12px; color: var(--chu-nhat); }
+
+@media print {
+  .khong-in,
+  .thanh-dau,
+  .chan,
+  .vung-bao,
+  .man-che { display: none !important; }
+
+  .chi-in { display: block; }
+
+  body { background: #fff; font-size: 11pt; }
+  .khung { max-width: none; padding: 0; }
+
+  .the {
+    border: 1px solid #999;
+    box-shadow: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 10px;
+  }
+
+  .luoi.c2 { grid-template-columns: 1fr 1fr; }
+  .luoi.c4 { grid-template-columns: repeat(4, 1fr); }
+
+  .bang-bao { overflow: visible; border-color: #999; }
+  thead th { background: #eee !important; color: #000; }
+  .o-so { border-color: #999; }
+
+  a { text-decoration: none; color: inherit; }
+  .thanh-ray { border: 1px solid #999; }
+  .thanh-day { background: #666 !important; }
+}

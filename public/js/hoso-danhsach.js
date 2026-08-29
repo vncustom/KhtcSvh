@@ -3,7 +3,8 @@
  */
 
 import { goiCanDangNhap as api, soVn, ngayVn, chu, $ } from './api.js';
-import { dungKhung, coQuyen, bao } from './khung.js';
+import { dungKhung, coQuyen, bao, cho } from './khung.js';
+import { taiVe } from './bao-cao.js';
 import { LOP_TRANG_THAI, TEN_TRANG_THAI, giaySangChu, tongThoiLuong } from './hoso-chung.js';
 
 const loc = { trang: 1, moi_trang: 20, sap_xep: 'moi_nhat', trang_thai: '' };
@@ -211,3 +212,19 @@ $('nutTruoc').addEventListener('click', () => { loc.trang--; nap(); });
 $('nutSau').addEventListener('click', () => { loc.trang++; nap(); });
 $('nutThem').addEventListener('click', () => { location.href = '/ho-so-sua'; });
 $('nutNhapExcel').addEventListener('click', () => { location.href = '/nhap-excel'; });
+
+$('nutXuatExcel').addEventListener('click', (ev) => cho(ev.currentTarget, async () => {
+  // Xuất đúng bộ lọc đang xem, không chỉ trang hiện tại.
+  const r = await api('xuatExcel', {
+    loai: 'HO_SO',
+    loc: {
+      ...loc,
+      tu_khoa: $('fTuKhoa').value,
+      don_vi_id: $('fDonVi').value,
+      kenh: $('fKenh').value,
+      the_loai: $('fTheLoai').value
+    }
+  });
+  taiVe(r.ten_tep, r.du_lieu);
+  bao('Đã tạo tệp ' + r.ten_tep);
+}));

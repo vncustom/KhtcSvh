@@ -6,7 +6,10 @@
   "description": "Cong quan tri ho so chuong trinh - Ban Ke hoach - Tai chinh, HTV",
   "scripts": {
     "dev": "node --env-file-if-exists=.env.local scripts/dev.js",
-    "bimat": "node -e \"console.log(require('node:crypto').randomBytes(32).toString('base64url'))\""
+    "bimat": "node -e \"console.log(require('node:crypto').randomBytes(32).toString('base64url'))\"",
+    "kiemtra": "node scripts/kiem-tra-quyen.mjs"
   },
-  "engines": { "node": ">=20.6" }
+  "engines": {
+    "node": ">=20.6"
+  }
 }

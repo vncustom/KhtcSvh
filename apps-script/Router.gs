@@ -220,7 +220,12 @@ const ACTIONS = {
   guiMaChiaSe: guiMaChiaSe_,
   xacThucPhieu: xacThucPhieu_,
   noiDungPhieu: noiDungPhieu_,
-  ghiLuotMoTep: ghiLuotMoTep_
+  ghiLuotMoTep: ghiLuotMoTep_,
+
+  /* ----- Giai đoạn 5: báo cáo ----- */
+
+  baoCaoTongHop: baoCaoTongHop_,
+  xuatExcel: xuatExcel_
 };
 
 /** Xác thực phiên đăng nhập từ token trong cookie. */

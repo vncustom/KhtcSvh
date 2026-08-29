@@ -4,7 +4,7 @@ Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Ch
 
 Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ liệu trong Google Sheet · tài liệu trên Google Drive.
 
-**Trạng thái: Giai đoạn 4 hoàn tất** — hồ sơ, quy trình duyệt, tệp đính kèm, nhập từ Excel, hợp đồng – thanh toán, và phiếu chia sẻ kèm mã QR đều đã hoạt động.
+**Trạng thái: Giai đoạn 5 hoàn tất** — toàn bộ nghiệp vụ đã hoạt động: hồ sơ, quy trình duyệt, tệp đính kèm, nhập từ Excel, hợp đồng – thanh toán, phiếu chia sẻ kèm mã QR, báo cáo và hướng dẫn sử dụng.
 
 ---
 
@@ -20,6 +20,8 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   nhap-excel.html     Nhập nhiều hồ sơ từ phiếu Excel của đơn vị
   hop-dong.html       Hợp đồng toàn đài: lọc, cảnh báo hạn, tiến độ chi trả
   xem.html            Trang tra cứu công khai cho đối tác quét mã QR
+  bao-cao.html        Báo cáo tổng hợp, xuất Excel, bản in
+  huong-dan.html      Hướng dẫn sử dụng theo từng vai trò
   quan-tri.html       Người dùng · Đơn vị · Cấu hình · Nhật ký
   kiem-tra.html       Trang kiểm tra đường truyền của Giai đoạn 0
   css/app.css         Bảng màu navy và các thành phần dùng chung
@@ -30,6 +32,7 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   js/hoso-danhsach.js js/hoso-chitiet.js   js/hoso-sua.js      js/hoso-tep.js
   js/nhap-excel.js    js/hoso-hopdong.js   js/hopdong-danhsach.js
   js/hoso-chiase.js   js/xem.js            js/qr.js
+  js/bao-cao.js       js/huong-dan.js
 
 api/               Tuyến trung gian chạy trên Vercel (Node)
   goi.js             Cửa chung cho mọi action nghiệp vụ
@@ -58,12 +61,14 @@ apps-script/       Mã chạy trên Google Apps Script
   NhapExcel.gs       Đọc phiếu Excel và tạo hồ sơ hàng loạt
   HopDong.gs         Hợp đồng, phụ lục, biên bản và các đợt thanh toán
   ChiaSe.gs          Phiếu chia sẻ, xác thực đối tác, nhật ký truy cập
+  BaoCao.gs          Tổng hợp số liệu và xuất tệp .xlsx
   Setup.gs           Khởi tạo bảng và dữ liệu mẫu
   Router.gs          Điểm vào doPost
 
-scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
+scripts/           Máy chủ chạy thử và bộ kiểm thử
   dev.js             Trông chừng và khởi động lại khi mã trong api/ thay đổi
   may-chu.js         Máy chủ HTTP
+  kiem-tra-quyen.mjs 41 phép kiểm phân quyền, chạy trên chính mã Apps Script
 ```
 
 ---
@@ -74,7 +79,7 @@ scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
 
 1. Mở [script.google.com](https://script.google.com) **bằng tài khoản Google có gói 5 TB** (tài khoản này sẽ sở hữu toàn bộ tệp Drive và hạn mức email).
 2. Bấm **Dự án mới**. Đặt tên: `HTV KHTC API`.
-3. Tạo đủ 18 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
+3. Tạo đủ 19 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
    Trong trình soạn thảo, dấu `.gs` được thêm tự động — chỉ cần gõ tên `Schema`, `Config`, …
 4. Mở **Project Settings** ➜ tích **Show "appsscript.json" manifest file**, rồi dán nội dung
    `apps-script/appsscript.json` đè lên file manifest.
@@ -383,7 +388,62 @@ thư viện `qrcode` chuẩn (44 trường hợp khớp tuyệt đối từng ô
 
 ---
 
+## Báo cáo và xuất dữ liệu
+
+Mục **Báo cáo** tổng hợp theo bốn cách gom nhóm: đơn vị chủ quản, kênh phát sóng,
+thể loại và tháng phát sóng. Có thêm bảng hợp đồng theo đơn vị kèm tiến độ chi trả
+cho người có quyền xem hợp đồng.
+
+Lọc theo khoảng ngày phát sóng, hoặc bấm nhanh *Tháng này · Tháng trước · Quý này · Năm nay*.
+
+| Nút | Kết quả |
+|---|---|
+| **Xuất Excel** | Tệp `.xlsx` thật, sáu trang tính — tổng quan và bốn cách gom nhóm, thêm trang hợp đồng |
+| **In / Lưu PDF** | Bản in có đầu trang cơ quan, ẩn hết thanh điều hướng và nút bấm |
+
+Trang **danh sách hồ sơ** cũng có nút *Xuất Excel*, xuất đúng bộ lọc đang xem —
+toàn bộ kết quả chứ không chỉ trang hiện tại.
+
+Apps Script không tạo thẳng được `.xlsx`, nên cách làm là dựng một Google Sheet tạm,
+lấy tệp qua đường dẫn xuất của Google, rồi xoá bảng tạm đi ngay.
+
+Mọi con số trong báo cáo đều tính trong đúng phạm vi vai trò của người xem, dùng chung
+hàm lọc với danh sách hồ sơ nên hai nơi không bao giờ lệch nhau.
+
+---
+
+## Hướng dẫn sử dụng
+
+Mục **Hướng dẫn** trong ứng dụng, chia bốn phần theo vai trò: đơn vị chủ quản,
+Ban Kế hoạch – Tài chính, quản trị hệ thống và đối tác. Trang tự mở phần hợp với
+vai trò của người đang đăng nhập. Nút *In / Lưu PDF* in cả bốn phần để phát tay.
+
+---
+
+## Kiểm thử
+
+```bash
+npm run kiemtra
+```
+
+Chạy 41 phép kiểm phân quyền. Bộ kiểm nạp thẳng `Util.gs`, `Quyen.gs` và `HoSo.gs`
+rồi chạy trên dữ liệu giả, nên nó kiểm đúng logic sẽ chạy thật chứ không phải một
+bản chép lại. Phạm vi kiểm: ai xem được hồ sơ nào, ai sửa được, ai gửi duyệt và duyệt
+được, chuyển trạng thái có đúng chặng không, nút nào hiện ra cho vai trò nào, và
+hai tham số `DON_VI_GUI_DUYET_HO` với `DON_VI_CHU_QUAN_DUOC_DUYET` có thật sự
+đổi hành vi không.
+
+Nên chạy lại mỗi khi sửa bảng phân quyền.
+
+---
+
 ## Giai đoạn tiếp theo
 
-**Giai đoạn 5 — Báo cáo và bàn giao.** Xuất Excel và PDF, báo cáo theo đơn vị và theo kênh;
-kiểm thử phân quyền và bảo mật; tài liệu hướng dẫn cho ba nhóm người dùng.
+Toàn bộ phạm vi trong bản kế hoạch đã hoàn thành. Những việc còn có thể làm tiếp,
+theo thứ tự đáng làm trước:
+
+1. **Đặt lịch chạy đêm** cho `kiemTraLinkHangDem` và `donDepPhienHetHan`.
+2. **Sao lưu tự động** file Google Sheet sang thư mục sao lưu, giữ 30 bản.
+3. **Chuyển sang tài khoản Google Workspace** nếu trần 100 email/ngày thành vướng —
+   mã nguồn không phải sửa gì, chỉ nới hạn mức.
+4. **Duyệt hai cấp** nếu quy trình cần: lãnh đạo đơn vị duyệt trước, Ban KH-TC duyệt sau.
