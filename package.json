@@ -1,0 +1,12 @@
+{
+  "name": "htv-khtc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cong quan tri ho so chuong trinh - Ban Ke hoach - Tai chinh, HTV",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.local scripts/dev.js",
+    "bimat": "node -e \"console.log(require('node:crypto').randomBytes(32).toString('base64url'))\""
+  },
+  "engines": { "node": ">=20.6" }
+}
