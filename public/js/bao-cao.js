@@ -6,6 +6,7 @@ import { goiCanDangNhap as api, soVn, chu, $ } from './api.js';
 import { dungKhung, coQuyen, bao, cho } from './khung.js';
 import { tongThoiLuong, giaySangChu, TEN_TRANG_THAI } from './hoso-chung.js';
 import { tien } from './hoso-hopdong.js';
+import { taiVe } from './taive.js';
 
 let ketQua = null;
 
@@ -251,25 +252,3 @@ $('nutXuat').addEventListener('click', (ev) => cho(ev.currentTarget, async () =>
   taiVe(r.ten_tep, r.du_lieu);
   bao('Đã tạo tệp ' + r.ten_tep);
 }));
-
-/** Đổi chuỗi base64 thành tệp rồi để trình duyệt tải xuống. */
-export function taiVe(tenTep, base64) {
-  const nhiPhan = atob(base64);
-  const byte = new Uint8Array(nhiPhan.length);
-  for (let i = 0; i < nhiPhan.length; i++) byte[i] = nhiPhan.charCodeAt(i);
-
-  const blob = new Blob([byte], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = tenTep;
-  document.body.append(a);
-  a.click();
-  a.remove();
-
-  // Thu hồi địa chỉ tạm sau khi trình duyệt đã kịp bắt đầu tải.
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
-}

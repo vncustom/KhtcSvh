@@ -4,7 +4,7 @@
 
 import { goiCanDangNhap as api, soVn, ngayVn, chu, $ } from './api.js';
 import { dungKhung, coQuyen, bao, cho } from './khung.js';
-import { taiVe } from './bao-cao.js';
+import { taiVe } from './taive.js';
 import { LOP_TRANG_THAI, TEN_TRANG_THAI, giaySangChu, tongThoiLuong } from './hoso-chung.js';
 
 const loc = { trang: 1, moi_trang: 20, sap_xep: 'moi_nhat', trang_thai: '' };
