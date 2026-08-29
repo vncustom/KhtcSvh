@@ -510,6 +510,7 @@ function bangDieuKhien_(payload, ctx) {
       return d.loai === 'DOI_TAC' && d.trang_thai === 'HOAT_DONG';
     }).length,
     top_don_vi: topDonVi,
+    hop_dong: canhBaoHopDong_(ctx),
     moi_nhat: ds.dong,
     duoc_duyet: co_(ctx, 'ho_so.duyet'),
     duoc_them: co_(ctx, 'ho_so.them')

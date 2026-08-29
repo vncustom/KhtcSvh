@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hợp đồng — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <h1 style="margin:0 0 18px;font-size:22px;font-weight:600;color:var(--navy-800)">
+    Hợp đồng toàn đài
+  </h1>
+
+  <section class="luoi c4" id="oSoLieu" style="margin-bottom:20px"></section>
+
+  <div class="loc-nhanh" id="locNhanh"></div>
+
+  <div class="the" style="margin-bottom:18px;padding:14px 16px">
+    <div class="luoi" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+      <input class="o-nhap" id="fTuKhoa" type="search"
+             placeholder="Tìm số hợp đồng, chương trình, đơn vị…">
+      <select class="o-nhap" id="fDonVi"><option value="">Mọi đơn vị</option></select>
+      <select class="o-nhap" id="fLoai">
+        <option value="">Mọi loại</option>
+        <option value="HD_CHINH">Hợp đồng chính</option>
+        <option value="PHU_LUC">Phụ lục hợp đồng</option>
+        <option value="NGHIEM_THU">Biên bản nghiệm thu</option>
+        <option value="THANH_LY">Biên bản thanh lý</option>
+      </select>
+      <select class="o-nhap" id="fTrangThai">
+        <option value="">Mọi trạng thái</option>
+        <option value="DU_THAO">Dự thảo</option>
+        <option value="DANG_HIEU_LUC">Đang hiệu lực</option>
+        <option value="HOAN_THANH">Đã hoàn thành</option>
+        <option value="THANH_LY">Đã thanh lý</option>
+        <option value="HUY">Đã huỷ</option>
+      </select>
+      <button class="nut nut-phu" id="nutXoaLoc" type="button">Bỏ lọc</button>
+    </div>
+  </div>
+
+  <div id="dsHopDong"></div>
+
+  <div class="hang-nut" style="margin-top:16px;justify-content:center;align-items:center">
+    <button class="nut nut-phu" id="nutTruoc" type="button">← Trước</button>
+    <span id="soTrang" style="font-size:13px;color:var(--chu-nhat);padding:0 12px"></span>
+    <button class="nut nut-phu" id="nutSau" type="button">Sau →</button>
+  </div>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<div id="vungHopThoai"></div>
+
+<script type="module" src="/js/hopdong-danhsach.js"></script>
+</body>
+</html>

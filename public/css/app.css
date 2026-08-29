@@ -791,3 +791,71 @@ a.thanh-do:hover .thanh-nhan span:first-child { color: var(--navy-700); }
 }
 
 .vung-tha.dang-doc { cursor: progress; border-style: solid; }
+
+/* ---------- Thẻ hợp đồng ---------- */
+
+.hd-the {
+  border: 1px solid var(--duong);
+  border-left: 3px solid var(--navy-700);
+  border-radius: 0 var(--bo-goc) var(--bo-goc) 0;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: var(--mat);
+}
+
+.hd-the:last-child { margin-bottom: 0; }
+.hd-the.hd-sap-han { border-left-color: var(--canh-bao); }
+.hd-the.hd-qua-han { border-left-color: var(--loi); }
+
+.hd-dau {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.hd-so {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--navy-800);
+}
+
+.hd-loai { font-size: 13px; color: var(--chu-nhat); }
+
+.hd-luoi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px 16px;
+}
+
+.hd-nhan {
+  font-size: 12px;
+  color: var(--chu-mo);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.hd-gia-tri {
+  font-size: 13.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+/* ---------- Mốc cần chú ý trên bảng điều khiển ---------- */
+
+.moc-gap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--duong-nhat);
+  text-decoration: none;
+  color: inherit;
+}
+
+.moc-gap:last-child { border-bottom: 0; }
+.moc-gap:hover { background: var(--nen); }
+.moc-gap .trang-thai { margin-left: auto; flex: none; }

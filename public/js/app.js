@@ -5,6 +5,7 @@
 import { goiCanDangNhap as api, soVn, chu, $ } from './api.js';
 import { dungKhung, coQuyen, bao, cho } from './khung.js';
 import { LOP_TRANG_THAI, TEN_TRANG_THAI, tongThoiLuong } from './hoso-chung.js';
+import { tien } from './hoso-hopdong.js';
 
 const NHAN_QUYEN = {
   '*': 'Toàn quyền',
@@ -50,6 +51,7 @@ const NHAN_QUYEN = {
     veTheoTrangThai(d.theo_trang_thai);
     veTheoDonVi(d.top_don_vi);
     veMoiNhat(d.moi_nhat);
+    veHopDong(d.hop_dong);
     $('nutTaoHoSo').classList.toggle('an', !d.duoc_them);
   } catch (e) {
     bao(e.message, 'loi', 7);
@@ -235,6 +237,77 @@ function o(chuNoi) {
   const td = document.createElement('td');
   td.textContent = chuNoi ?? '';
   return td;
+}
+
+/* ---------- Hợp đồng cần chú ý ---------- */
+
+function veHopDong(hd) {
+  if (!hd) return;
+
+  if (hd.danh_sach_gap.length) {
+    $('khoiHopDong').classList.remove('an');
+    const vung = $('hopDongGap');
+    vung.replaceChildren();
+
+    for (const c of hd.danh_sach_gap) {
+      const a = document.createElement('a');
+      a.className = 'moc-gap';
+      a.href = '/ho-so-chi-tiet?id=' + encodeURIComponent(c.ho_so_id);
+
+      const trai = document.createElement('div');
+      trai.style.minWidth = '0';
+      const s = document.createElement('div');
+      s.style.cssText = 'font-family:var(--font-mono);font-size:13px;font-weight:500';
+      s.textContent = c.so_hop_dong;
+      const t = document.createElement('div');
+      t.style.cssText = 'font-size:12.5px;color:var(--chu-mo);'
+        + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      t.textContent = c.ten_chuong_trinh;
+      trai.append(s, t);
+
+      const chip = document.createElement('span');
+      chip.className = 'trang-thai ' + (c.qua_han ? 'loi' : 'canh-bao');
+      chip.textContent = (c.qua_han ? 'Quá hạn ' : 'Hết hạn ') + ngayNgan(c.ngay_het_han);
+
+      a.append(trai, chip);
+      vung.append(a);
+    }
+  }
+
+  if (hd.dot_gap.length) {
+    $('khoiThanhToan').classList.remove('an');
+    const vung = $('dotGap');
+    vung.replaceChildren();
+
+    for (const t of hd.dot_gap) {
+      const a = document.createElement('a');
+      a.className = 'moc-gap';
+      a.href = '/hop-dong';
+
+      const trai = document.createElement('div');
+      trai.style.minWidth = '0';
+      const s = document.createElement('div');
+      s.style.cssText = 'font-family:var(--font-mono);font-size:13px;font-weight:500';
+      s.textContent = `${t.so_hop_dong} · đợt ${t.dot}`;
+      const m = document.createElement('div');
+      m.style.cssText = 'font-size:12.5px;color:var(--chu-mo)';
+      m.textContent = tien(t.so_tien);
+      trai.append(s, m);
+
+      const chip = document.createElement('span');
+      chip.className = 'trang-thai ' + (t.qua_han ? 'loi' : 'canh-bao');
+      chip.textContent = (t.qua_han ? 'Quá hạn ' : 'Đến hạn ') + ngayNgan(t.ngay_du_kien);
+
+      a.append(trai, chip);
+      vung.append(a);
+    }
+  }
+}
+
+function ngayNgan(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return isNaN(d) ? iso : d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
 }
 
 /* ---------- Tài khoản và quyền ---------- */

@@ -6,6 +6,7 @@ import { goiCanDangNhap as api, soVn, gioVn, ngayVn, chu, $ } from './api.js';
 import { dungKhung, bao, cho } from './khung.js';
 import { LOP_TRANG_THAI, HANH_DONG, VAI_TRO_DOI_TAC, maHoSoTuUrl, giaySangChu } from './hoso-chung.js';
 import { napTep } from './hoso-tep.js';
+import { napHopDong, datDonVi } from './hoso-hopdong.js';
 
 const maHoSo = maHoSoTuUrl();
 let danhMuc = {};
@@ -20,6 +21,14 @@ let danhMuc = {};
   }
 
   danhMuc = await api('layDanhMuc');
+
+  // Danh sách đơn vị dùng cho hộp thoại hợp đồng; đối tác không có quyền đọc.
+  try {
+    datDonVi(await api('danhSachDonViDayDu'));
+  } catch (e) {
+    datDonVi([]);
+  }
+
   await nap();
 })();
 
@@ -88,6 +97,7 @@ function ve(d) {
   veDoiTac(d.doi_tac);
   veThuMuc(h);
   napTep(h.ho_so_id);
+  napHopDong(h.ho_so_id);
   veNhatKy(d.nhat_ky);
   veHanhDong(d.duoc_lam, h);
 }

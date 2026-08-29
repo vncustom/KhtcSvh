@@ -194,7 +194,17 @@ const ACTIONS = {
   /* ----- Nhập hồ sơ hàng loạt từ phiếu Excel ----- */
 
   docFileExcel: docFileExcel_,
-  taoHangLoat: taoHangLoat_
+  taoHangLoat: taoHangLoat_,
+
+  /* ----- Giai đoạn 4: hợp đồng và thanh toán ----- */
+
+  danhSachHopDong: danhSachHopDong_,
+  hopDongCuaHoSo: hopDongCuaHoSo_,
+  chiTietHopDong: chiTietHopDong_,
+  luuHopDong: luuHopDong_,
+  xoaHopDong: xoaHopDong_,
+  luuThanhToan: luuThanhToan_,
+  xoaThanhToan: xoaThanhToan_
 };
 
 /** Xác thực phiên đăng nhập từ token trong cookie. */

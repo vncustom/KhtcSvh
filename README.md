@@ -4,7 +4,7 @@ Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Ch
 
 Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ liệu trong Google Sheet · tài liệu trên Google Drive.
 
-**Trạng thái: Giai đoạn 3+** — hồ sơ, quy trình duyệt, tệp đính kèm và nhập hàng loạt từ Excel đã hoạt động. Hợp đồng và phiếu chia sẻ sẽ có ở Giai đoạn 4.
+**Trạng thái: Giai đoạn 4A** — hồ sơ, quy trình duyệt, tệp đính kèm, nhập từ Excel và hợp đồng – thanh toán đã hoạt động. Phiếu chia sẻ và mã QR sẽ có ở Giai đoạn 4B.
 
 ---
 
@@ -18,6 +18,7 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   ho-so-chi-tiet.html Xem một hồ sơ và thực hiện các bước duyệt
   ho-so-sua.html      Biểu mẫu thêm và sửa hồ sơ
   nhap-excel.html     Nhập nhiều hồ sơ từ phiếu Excel của đơn vị
+  hop-dong.html       Hợp đồng toàn đài: lọc, cảnh báo hạn, tiến độ chi trả
   quan-tri.html       Người dùng · Đơn vị · Cấu hình · Nhật ký
   kiem-tra.html       Trang kiểm tra đường truyền của Giai đoạn 0
   css/app.css         Bảng màu navy và các thành phần dùng chung
@@ -26,7 +27,7 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   js/hoso-chung.js    Hằng số và nhãn dùng chung cho ba trang hồ sơ
   js/dangnhap.js      js/app.js            js/quantri.js       js/kiemtra.js
   js/hoso-danhsach.js js/hoso-chitiet.js   js/hoso-sua.js      js/hoso-tep.js
-  js/nhap-excel.js
+  js/nhap-excel.js    js/hoso-hopdong.js   js/hopdong-danhsach.js
 
 api/               Tuyến trung gian chạy trên Vercel (Node)
   goi.js             Cửa chung cho mọi action nghiệp vụ
@@ -52,6 +53,7 @@ apps-script/       Mã chạy trên Google Apps Script
   HoSo.gs            Hồ sơ chương trình và quy trình duyệt
   Tep.gs             Tệp đính kèm: tải lên, dán link, kiểm tra link
   NhapExcel.gs       Đọc phiếu Excel và tạo hồ sơ hàng loạt
+  HopDong.gs         Hợp đồng, phụ lục, biên bản và các đợt thanh toán
   Setup.gs           Khởi tạo bảng và dữ liệu mẫu
   Router.gs          Điểm vào doPost
 
@@ -68,7 +70,7 @@ scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
 
 1. Mở [script.google.com](https://script.google.com) **bằng tài khoản Google có gói 5 TB** (tài khoản này sẽ sở hữu toàn bộ tệp Drive và hạn mức email).
 2. Bấm **Dự án mới**. Đặt tên: `HTV KHTC API`.
-3. Tạo đủ 16 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
+3. Tạo đủ 17 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
    Trong trình soạn thảo, dấu `.gs` được thêm tự động — chỉ cần gõ tên `Schema`, `Config`, …
 4. Mở **Project Settings** ➜ tích **Show "appsscript.json" manifest file**, rồi dán nội dung
    `apps-script/appsscript.json` đè lên file manifest.
@@ -281,8 +283,37 @@ thì viết `giờ:phút:giây`.
 
 ---
 
+## Hợp đồng và thanh toán
+
+Xem toàn đài ở mục **Hợp đồng** trên thanh điều hướng, hoặc xem theo từng hồ sơ
+ở thẻ *Hợp đồng & thanh toán* trong trang chi tiết hồ sơ.
+
+**Vòng đời hợp đồng:** Dự thảo → Đang hiệu lực → Đã hoàn thành → Đã thanh lý. Hợp đồng
+bỏ dở thì chuyển sang *Đã huỷ*, đừng xoá — hệ thống cũng từ chối xoá hợp đồng đã có
+đợt chi trả, để không mất dấu vết tiền bạc.
+
+**Các đợt thanh toán** nằm trong hộp thoại riêng của từng hợp đồng: số đợt, diễn giải,
+số tiền, ngày dự kiến và ngày thực tế. Đánh dấu *Đã thanh toán* thì bắt buộc có ngày thực tế.
+Nếu tổng các đợt vượt giá trị hợp đồng, hệ thống vẫn lưu nhưng báo rõ phần vượt.
+
+**Cảnh báo tự động**, ngưỡng 30 ngày:
+
+| Trên bảng điều khiển | Nội dung |
+|---|---|
+| Hợp đồng cần chú ý | Đang hiệu lực mà sắp hết hạn, hoặc đã quá hạn chưa chuyển trạng thái |
+| Đợt thanh toán đến hạn | Đợt chưa chi trả đã tới hoặc quá ngày dự kiến |
+
+Cả hai khối chỉ hiện khi thật sự có việc cần làm, và **lọc theo phạm vi vai trò** —
+đơn vị chủ quản chỉ thấy hợp đồng của hồ sơ đơn vị mình, đối tác chỉ thấy hợp đồng
+ký với chính mình.
+
+**Kiểm tra khi lưu:** số hợp đồng phải là duy nhất; ngày ký ≤ ngày hiệu lực ≤ ngày hết hạn;
+giá trị không âm.
+
+---
+
 ## Giai đoạn tiếp theo
 
-**Giai đoạn 4 — Hợp đồng, thanh toán, phiếu chia sẻ.** Hợp đồng và các đợt thanh toán,
-cảnh báo đến hạn; phiếu chia sẻ kèm mã QR, trang tra cứu cho đối tác, xác thực bằng
-OTP hoặc PIN động, theo dõi lượt truy cập và thu hồi.
+**Giai đoạn 4B — Phiếu chia sẻ và mã QR.** Cấp phiếu cho từng đối tác kèm hạn dùng
+và phạm vi tệp; sinh mã QR để in lên hợp đồng; trang tra cứu công khai xác thực bằng
+OTP gửi email hoặc PIN động; theo dõi lượt truy cập và thu hồi phiếu tức thì.
