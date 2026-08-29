@@ -78,12 +78,19 @@
       </section>
 
       <section class="the" style="grid-column:1/-1">
-        <h2>Tài liệu đính kèm</h2>
+        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px">
+          <h2 style="margin:0">Tài liệu đính kèm</h2>
+          <span id="demTep" style="font-size:13px;color:var(--chu-nhat)"></span>
+          <div class="hang-nut" style="margin-left:auto" id="nutTep"></div>
+        </div>
         <p class="mo-ta">
-          Phần quản lý tệp sẽ có ở Giai đoạn 3. Hiện tại thư mục đã được tạo sẵn trên Drive
-          và có thể mở trực tiếp.
+          Tài liệu, hợp đồng, audio và hình ảnh được lưu trong thư mục của hồ sơ trên Drive.
+          Video không tải lên hệ thống — hãy dán link từ kho video.
         </p>
-        <div id="oThuMuc"></div>
+
+        <div id="dsTep"></div>
+
+        <div id="oThuMuc" style="margin-top:16px"></div>
       </section>
 
       <section class="the" style="grid-column:1/-1">
@@ -102,6 +109,8 @@
 </footer>
 
 <div id="vungHopThoai"></div>
+
+<div id="vungXem"></div>
 
 <script type="module" src="/js/hoso-chitiet.js"></script>
 </body>

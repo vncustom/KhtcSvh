@@ -178,7 +178,18 @@ const ACTIONS = {
   luuHoSo: luuHoSo_,
   doiTrangThaiHoSo: doiTrangThaiHoSo_,
   xoaHoSo: xoaHoSo_,
-  bangDieuKhien: bangDieuKhien_
+  bangDieuKhien: bangDieuKhien_,
+
+  /* ----- Giai đoạn 3: tệp đính kèm ----- */
+
+  danhSachTep: danhSachTep_,
+  taiLenTep: taiLenTep_,
+  moPhienTaiLen: moPhienTaiLen_,
+  hoanTatTaiLen: hoanTatTaiLen_,
+  themLinkTep: themLinkTep_,
+  capNhatTep: capNhatTep_,
+  xoaTep: xoaTep_,
+  kiemTraLinkTep: kiemTraLinkTep_
 };
 
 /** Xác thực phiên đăng nhập từ token trong cookie. */

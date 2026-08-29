@@ -5,6 +5,7 @@
 import { goiCanDangNhap as api, soVn, gioVn, ngayVn, chu, $ } from './api.js';
 import { dungKhung, bao, cho } from './khung.js';
 import { LOP_TRANG_THAI, HANH_DONG, VAI_TRO_DOI_TAC, maHoSoTuUrl } from './hoso-chung.js';
+import { napTep } from './hoso-tep.js';
 
 const maHoSo = maHoSoTuUrl();
 let danhMuc = {};
@@ -85,6 +86,7 @@ function ve(d) {
 
   veDoiTac(d.doi_tac);
   veThuMuc(h);
+  napTep(h.ho_so_id);
   veNhatKy(d.nhat_ky);
   veHanhDong(d.duoc_lam, h);
 }

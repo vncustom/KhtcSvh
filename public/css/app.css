@@ -724,3 +724,45 @@ a.thanh-do:hover .thanh-nhan span:first-child { color: var(--navy-700); }
 .thanh-day.muc-canh-bao { background: var(--canh-bao); }
 .thanh-day.muc-cho { background: var(--chu-mo); }
 .thanh-day.muc-loi { background: var(--loi); }
+
+/* ---------- Danh sách tệp đính kèm ---------- */
+
+.tep-hang {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--duong-nhat);
+}
+
+.tep-hang:last-child { border-bottom: 0; }
+
+.tep-icon {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  background: var(--mat-2);
+  border-radius: 5px;
+}
+
+.tep-ten {
+  font-size: 14px;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.tep-phu {
+  font-size: 12.5px;
+  color: var(--chu-mo);
+  margin-top: 1px;
+}
+
+.tep-hang .hang-nut { margin-left: auto; align-items: flex-start; }
+
+@media (max-width: 640px) {
+  .tep-hang { flex-wrap: wrap; }
+  .tep-hang .hang-nut { margin-left: 46px; width: 100%; }
+}

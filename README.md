@@ -4,7 +4,7 @@ Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Ch
 
 Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ liệu trong Google Sheet · tài liệu trên Google Drive.
 
-**Trạng thái: Giai đoạn 2** — hồ sơ chương trình và quy trình duyệt đã hoạt động. Hợp đồng, tệp đính kèm và phiếu chia sẻ sẽ có ở các giai đoạn sau.
+**Trạng thái: Giai đoạn 3** — hồ sơ, quy trình duyệt và tệp đính kèm đã hoạt động. Hợp đồng và phiếu chia sẻ sẽ có ở Giai đoạn 4.
 
 ---
 
@@ -24,7 +24,7 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   js/khung.js         Khung trang dùng chung: người đang đăng nhập, menu, đăng xuất
   js/hoso-chung.js    Hằng số và nhãn dùng chung cho ba trang hồ sơ
   js/dangnhap.js      js/app.js            js/quantri.js       js/kiemtra.js
-  js/hoso-danhsach.js js/hoso-chitiet.js   js/hoso-sua.js
+  js/hoso-danhsach.js js/hoso-chitiet.js   js/hoso-sua.js      js/hoso-tep.js
 
 api/               Tuyến trung gian chạy trên Vercel (Node)
   goi.js             Cửa chung cho mọi action nghiệp vụ
@@ -48,6 +48,7 @@ apps-script/       Mã chạy trên Google Apps Script
   CauHinh.gs         Cấu hình, thư mục Drive, nhật ký
   Drive.gs           Cây thư mục lưu trữ của từng hồ sơ
   HoSo.gs            Hồ sơ chương trình và quy trình duyệt
+  Tep.gs             Tệp đính kèm: tải lên, dán link, kiểm tra link
   Setup.gs           Khởi tạo bảng và dữ liệu mẫu
   Router.gs          Điểm vào doPost
 
@@ -64,7 +65,7 @@ scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
 
 1. Mở [script.google.com](https://script.google.com) **bằng tài khoản Google có gói 5 TB** (tài khoản này sẽ sở hữu toàn bộ tệp Drive và hạn mức email).
 2. Bấm **Dự án mới**. Đặt tên: `HTV KHTC API`.
-3. Tạo đủ 14 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
+3. Tạo đủ 15 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
    Trong trình soạn thảo, dấu `.gs` được thêm tự động — chỉ cần gõ tên `Schema`, `Config`, …
 4. Mở **Project Settings** ➜ tích **Show "appsscript.json" manifest file**, rồi dán nội dung
    `apps-script/appsscript.json` đè lên file manifest.
@@ -169,20 +170,49 @@ sẽ nhắc nếu bạn quên.
 
 **Video không nằm trong hệ thống.** Video ở kho Drive 20 TB riêng, đưa vào bằng link chia sẻ.
 Vì các link đó để chế độ "bất kỳ ai có link", phiếu chia sẻ bảo vệ được hợp đồng và tài liệu
-nhưng không bảo vệ được video.
+nhưng không bảo vệ được video. Tệp video chưa phát sóng nên đánh dấu **nhạy cảm** khi dán link,
+và để chế độ riêng tư ở kho video.
+
+**Phiên tải lên cần được thử với tệp thật.** Đường tải tệp lớn gửi dữ liệu thẳng từ trình duyệt
+tới Google. Cách này đang được dùng phổ biến, nhưng nếu trình duyệt bị chặn thì hệ thống sẽ báo
+rõ và hướng dẫn tải lên Drive rồi dán link. Hãy thử một tệp khoảng 10 MB để xác nhận.
 
 ---
 
-## Nâng cấp lên Giai đoạn 2
+## Nâng cấp lên Giai đoạn 3
 
-1. **Thêm 2 file mới** vào dự án Apps Script: `Drive`, `HoSo`.
-   Dán đè `Quyen`, `Repo` và `Router` bằng bản mới.
+1. **Thêm file `Tep`** vào dự án Apps Script. Dán đè `Router` bằng bản mới.
 2. **Triển khai lại**: Deploy ➜ Manage deployments ➜ bấm bút chì ➜ Version: **New version** ➜ Deploy.
-   Bỏ qua bước này thì hệ thống báo *Không có action "danhSachHoSo"*.
-3. Vào mục **Quản trị ➜ Cấu hình**, kiểm tra đã có thư mục gốc trên Drive.
-   Thiếu thư mục thì không tạo được hồ sơ.
+3. *(Nên làm)* Đặt lịch kiểm tra link hằng đêm: trong trình soạn thảo Apps Script,
+   mở **Triggers** ➜ **Add Trigger** ➜ hàm `kiemTraLinkHangDem`, nguồn **Time-driven**,
+   loại **Day timer**, khung giờ 1–2 giờ sáng.
 
-Lần này không cần chạy lại `khoiTaoCoSoDuLieu` vì cấu trúc bảng không đổi.
+Không cần chạy lại `khoiTaoCoSoDuLieu` vì cấu trúc bảng không đổi.
+
+---
+
+## Tệp đính kèm
+
+| Trường hợp | Cách làm | Nơi lưu |
+|---|---|---|
+| Tài liệu, hợp đồng, ảnh, audio dưới 3 MB | Bấm **Tải tệp lên** | Drive 5 TB của hệ thống |
+| Các tệp trên 3 MB, tối đa 512 MB | Bấm **Tải tệp lên** — trình duyệt tự chuyển sang phiên tải lên | Drive 5 TB của hệ thống |
+| Video | Bấm **Dán link video** | Kho video 20 TB, hồ sơ chỉ giữ mã tệp |
+
+Ngưỡng 3 MB đến từ hàm serverless của Vercel: thân yêu cầu tối đa 4,5 MB, mà mã hoá base64
+làm dữ liệu phình thêm một phần ba. Tệp lớn hơn được gửi thẳng từ trình duyệt tới Google
+theo từng khối 8 MB, không đi qua Vercel lẫn Apps Script.
+
+Khi dán link, hệ thống mở tệp trên Drive để đọc **tên và dung lượng thật**, rồi lưu mã tệp
+chứ không lưu chuỗi URL. Nhờ vậy link đổi dạng vẫn không mất tệp, và có thể kiểm tra được
+tệp còn sống hay không.
+
+**Tệp nào đối tác xem được** do người phụ trách tích chọn từng tệp. Không tích thì đối tác
+không thấy, kể cả khi hồ sơ đã duyệt.
+
+**Xem tệp** dùng trình xem nhúng của Drive, không hiện đường dẫn tệp gốc trong trang.
+Đây là một trong các biện pháp giảm rò rỉ đã nêu ở kế hoạch, vì video để chế độ
+"bất kỳ ai có link".
 
 ---
 
@@ -210,5 +240,6 @@ báo trước điều này. Ban KH-TC sửa thì không, vì họ duyệt đư�
 
 ## Giai đoạn tiếp theo
 
-**Giai đoạn 3 — Tệp đính kèm.** Tải tài liệu, audio, ảnh vào Drive 5 TB;
-dán link video từ kho 20 TB và kiểm chứng link; xem trước PDF, phát video và audio.
+**Giai đoạn 4 — Hợp đồng, thanh toán, phiếu chia sẻ.** Hợp đồng và các đợt thanh toán,
+cảnh báo đến hạn; phiếu chia sẻ kèm mã QR, trang tra cứu cho đối tác, xác thực bằng
+OTP hoặc PIN động, theo dõi lượt truy cập và thu hồi.
