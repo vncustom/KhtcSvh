@@ -3,12 +3,46 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kiểm tra kết nối — Cổng hồ sơ KHTC</title>
+<title>Đăng nhập — Cổng hồ sơ KHTC</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="/css/app.css">
+<style>
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+  .giua { flex: 1; display: grid; place-items: center; padding: 32px 20px; }
+  .hop { width: 100%; max-width: 420px; }
+  .hop .the { padding: 26px 28px; }
+  .buoc h1 { margin: 0 0 6px; font-size: 21px; font-weight: 600; color: var(--navy-800); }
+  .buoc .dan { margin: 0 0 22px; font-size: 13.5px; color: var(--chu-nhat); }
+  .truong { margin-bottom: 15px; }
+  .truong label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--chu); }
+  .mk-boc { position: relative; }
+  .mk-boc .o-nhap { padding-right: 76px; }
+  .mk-hien {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    background: none; border: 0; cursor: pointer; font: inherit; font-size: 12.5px;
+    color: var(--navy-500); padding: 4px 8px; border-radius: 4px;
+  }
+  .mk-hien:hover { background: var(--mat-2); }
+  .o-otp { display: flex; gap: 8px; justify-content: space-between; margin-bottom: 6px; }
+  .o-otp input {
+    width: 100%; aspect-ratio: 3 / 4; text-align: center;
+    font-family: var(--font-mono); font-size: 22px; font-weight: 500;
+    border: 1px solid var(--duong); border-radius: 6px; background: var(--mat); color: var(--chu);
+  }
+  .o-otp input:focus { border-color: var(--navy-500); outline: none; box-shadow: 0 0 0 3px rgba(34,84,143,.12); }
+  .dong-nho { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 18px; }
+  .ghi-nho { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; margin: 4px 0 18px; }
+  .ghi-nho input { margin-top: 3px; }
+  .ghi-nho span { color: var(--chu-nhat); }
+  .lien-ket { background: none; border: 0; padding: 0; font: inherit; font-size: 13px;
+              color: var(--navy-500); cursor: pointer; text-decoration: underline; }
+  .lien-ket:disabled { color: var(--chu-mo); cursor: default; text-decoration: none; }
+  .manh { font-size: 12.5px; color: var(--chu-nhat); margin: -8px 0 16px; }
+  .manh li { margin: 2px 0; }
+</style>
 </head>
 <body>
 
@@ -19,78 +53,96 @@
       <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
       <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
     </div>
-    <div class="con-lai">
-      <span id="trangThaiChung" class="trang-thai cho"><span class="cham"></span>Chưa kiểm tra</span>
-    </div>
   </div>
 </header>
 
-<main class="khung">
+<main class="giua">
+  <div class="hop">
 
-  <div class="the" style="margin-bottom:20px">
-    <h2>Kiểm tra đường truyền — Giai đoạn 0</h2>
-    <p class="mo-ta">
-      Trang này xác nhận ba chặng đã thông: trình duyệt → tuyến trung gian trên Vercel →
-      Apps Script → file Google Sheet. Khi cả ba chặng đều xanh thì Giai đoạn 1 bắt đầu được.
-    </p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button id="nutPing" class="nut nut-chinh">Kiểm tra kết nối</button>
-      <button id="nutTongQuan" class="nut nut-phu">Đọc số liệu</button>
-      <button id="nutGhiThu" class="nut nut-phu">Ghi thử một dòng</button>
-      <button id="nutDonVi" class="nut nut-phu">Xem danh sách đơn vị</button>
-    </div>
-    <div id="baoLoi" class="thong-bao loi an" style="margin-top:16px"></div>
+    <div id="baoLoi" class="thong-bao loi an" style="margin-bottom:14px"></div>
+    <div id="baoTin" class="thong-bao canh-bao an" style="margin-bottom:14px"></div>
+
+    <!-- Bước 1 — tên đăng nhập và mật khẩu -->
+    <section id="buocMatKhau" class="the buoc">
+      <h1>Đăng nhập hệ thống</h1>
+      <p class="dan">Quản lý hồ sơ chương trình, hợp đồng và tài liệu lưu trữ.</p>
+      <form id="formMatKhau" novalidate>
+        <div class="truong">
+          <label for="username">Tên đăng nhập</label>
+          <input class="o-nhap" id="username" name="username" type="text"
+                 autocomplete="username" autocapitalize="off" spellcheck="false" required>
+        </div>
+        <div class="truong">
+          <label for="matKhau">Mật khẩu</label>
+          <div class="mk-boc">
+            <input class="o-nhap" id="matKhau" name="matKhau" type="password"
+                   autocomplete="current-password" required>
+            <button class="mk-hien" type="button" id="nutHienMk" aria-label="Hiện mật khẩu">Hiện</button>
+          </div>
+        </div>
+        <button class="nut nut-chinh" type="submit" style="width:100%">Tiếp tục</button>
+      </form>
+    </section>
+
+    <!-- Bước 2 — mã xác thực -->
+    <section id="buocOtp" class="the buoc an">
+      <h1>Xác thực hai lớp</h1>
+      <p class="dan">Mã gồm 6 chữ số vừa được gửi tới <strong id="emailChe"></strong>.</p>
+      <form id="formOtp" novalidate>
+        <div class="o-otp" id="oOtp">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 1">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 2">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 3">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 4">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 5">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Chữ số 6">
+        </div>
+        <div class="dong-nho">
+          <span style="color:var(--chu-nhat)">Hiệu lực: <strong id="demNguoc">05:00</strong></span>
+          <button type="button" class="lien-ket" id="nutGuiLai" disabled>Gửi lại mã</button>
+        </div>
+        <label class="ghi-nho">
+          <input type="checkbox" id="ghiNho">
+          <span>Ghi nhớ máy này trong 30 ngày — lần sau đăng nhập không cần nhập mã.</span>
+        </label>
+        <button class="nut nut-chinh" type="submit" style="width:100%">Xác nhận</button>
+        <button class="nut nut-phu" type="button" id="nutQuayLai" style="width:100%;margin-top:8px">Quay lại</button>
+      </form>
+    </section>
+
+    <!-- Bước 3 — đổi mật khẩu bắt buộc -->
+    <section id="buocDoiMk" class="the buoc an">
+      <h1>Đặt mật khẩu mới</h1>
+      <p class="dan">Đây là lần đăng nhập đầu tiên của bạn. Hãy đặt một mật khẩu riêng trước khi tiếp tục.</p>
+      <form id="formDoiMk" novalidate>
+        <div class="truong">
+          <label for="mkCu">Mật khẩu hiện tại</label>
+          <input class="o-nhap" id="mkCu" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="truong">
+          <label for="mkMoi">Mật khẩu mới</label>
+          <input class="o-nhap" id="mkMoi" type="password" autocomplete="new-password" required>
+        </div>
+        <ul class="manh">
+          <li>Ít nhất 8 ký tự</li>
+          <li>Có cả chữ hoa và chữ thường</li>
+          <li>Có ít nhất một chữ số</li>
+        </ul>
+        <div class="truong">
+          <label for="mkLai">Nhập lại mật khẩu mới</label>
+          <input class="o-nhap" id="mkLai" type="password" autocomplete="new-password" required>
+        </div>
+        <button class="nut nut-chinh" type="submit" style="width:100%">Lưu và vào hệ thống</button>
+      </form>
+    </section>
+
   </div>
-
-  <section id="khoiChang" class="luoi c3 an" style="margin-bottom:20px">
-    <div class="the">
-      <span class="nhan">Chặng 1</span>
-      <h2>Tuyến trung gian Vercel</h2>
-      <p id="chang1" class="mo-ta" style="margin:0"></p>
-    </div>
-    <div class="the">
-      <span class="nhan">Chặng 2</span>
-      <h2>Apps Script</h2>
-      <p id="chang2" class="mo-ta" style="margin:0"></p>
-    </div>
-    <div class="the">
-      <span class="nhan">Chặng 3</span>
-      <h2>Google Sheet</h2>
-      <p id="chang3" class="mo-ta" style="margin:0"></p>
-    </div>
-  </section>
-
-  <section id="khoiSoLieu" class="luoi c4 an" style="margin-bottom:20px">
-    <div class="o-so"><div id="soDonVi" class="con-so">—</div><div class="ten">Đơn vị &amp; đối tác</div></div>
-    <div class="o-so"><div id="soNguoiDung" class="con-so">—</div><div class="ten">Tài khoản</div></div>
-    <div class="o-so"><div id="soDanhMuc" class="con-so">—</div><div class="ten">Mục danh mục</div></div>
-    <div class="o-so"><div id="soEmail" class="con-so">—</div><div class="ten">Email còn lại hôm nay</div></div>
-  </section>
-
-  <section id="khoiBang" class="the an" style="margin-bottom:20px">
-    <h2>Đơn vị đã nạp</h2>
-    <p class="mo-ta">Dữ liệu đọc trực tiếp từ tab <code>DON_VI</code> trong file Sheet.</p>
-    <div class="bang-bao">
-      <table>
-        <thead><tr><th>Mã</th><th>Tên</th><th>Loại</th><th>Email</th></tr></thead>
-        <tbody id="bangDonVi"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="the">
-    <h2>Kết quả thô</h2>
-    <p class="mo-ta">Nội dung máy chủ trả về, hữu ích khi cần chẩn đoán lỗi.</p>
-    <pre id="ketQuaTho" class="khoi-ma">Chưa có kết quả. Bấm “Kiểm tra kết nối” để bắt đầu.</pre>
-  </section>
-
 </main>
 
-<footer class="chan">
+<footer class="chan" style="text-align:center">
   © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
-  · Giai đoạn 0 — trang kiểm tra nội bộ
 </footer>
 
-<script type="module" src="/js/kiemtra.js"></script>
+<script type="module" src="/js/dangnhap.js"></script>
 </body>
 </html>

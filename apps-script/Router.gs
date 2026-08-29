@@ -5,15 +5,23 @@
  * Apps Script không đọc được header tuỳ ý, nên khoá dùng chung đi trong thân yêu cầu.
  */
 
-/** Các action không cần đăng nhập. */
-const ACTION_CONG_KHAI = ['ping', 'dangNhap', 'guiOtp', 'xacThucOtp', 'xemHoSoTheoPhieu', 'guiMaChiaSe'];
+/** Action không cần đăng nhập. */
+const ACTION_CONG_KHAI = [
+  'ping', 'dangNhap', 'xacThucOtp', 'guiLaiOtp',
+  'xemHoSoTheoPhieu', 'guiMaChiaSe'
+];
 
 /**
  * Action chỉ phục vụ Giai đoạn 0. Chúng bỏ qua bước đăng nhập, nên chỉ chạy
- * khi CHE_DO_KIEM_TRA đang bật. Sang Giai đoạn 1, đặt tham số này thành TAT
- * ở màn hình cấu hình là chúng tự khoá lại.
+ * khi CHE_DO_KIEM_TRA đang bật. Đặt tham số này thành TAT khi chạy thật.
  */
 const ACTION_KIEM_TRA = ['tongQuan', 'ghiThu', 'danhSachDonVi'];
+
+/**
+ * Action mà người vừa đăng nhập nhưng chưa đổi mật khẩu bắt buộc vẫn gọi được.
+ * Mọi action khác bị chặn cho tới khi đổi xong.
+ */
+const ACTION_KHI_CHUA_DOI_MK = ['layToi', 'doiMatKhau', 'dangXuat'];
 
 function doPost(e) {
   const batDau = new Date().getTime();
@@ -44,14 +52,26 @@ function doPost(e) {
       }, 403);
     }
 
-    // Các action cần đăng nhập phải kèm phiên hợp lệ.
-    if (ACTION_CONG_KHAI.indexOf(action) < 0 && ACTION_KIEM_TRA.indexOf(action) < 0) {
+    const canDangNhap = ACTION_CONG_KHAI.indexOf(action) < 0 && ACTION_KIEM_TRA.indexOf(action) < 0;
+
+    if (canDangNhap) {
       const user = xacThucPhien_(ctx.session);
-      if (!user) return traLoi_({ ok: false, loi: 'Phiên đã hết hạn, mời đăng nhập lại.', maLoi: 'HET_PHIEN' }, 401);
+      if (!user) {
+        return traLoi_({ ok: false, loi: 'Phiên đã hết hạn, mời đăng nhập lại.', maLoi: 'HET_PHIEN' }, 401);
+      }
       ctx.user_id = user.user_id;
       ctx.nhom = user.nhom;
       ctx.don_vi_id = user.don_vi_id;
       ctx.user = user;
+
+      const buocDoi = user.buoc_doi_mk === true || String(user.buoc_doi_mk).toUpperCase() === 'TRUE';
+      if (buocDoi && ACTION_KHI_CHUA_DOI_MK.indexOf(action) < 0) {
+        return traLoi_({
+          ok: false,
+          loi: 'Vui lòng đổi mật khẩu trước khi sử dụng hệ thống.',
+          maLoi: 'BUOC_DOI_MK'
+        }, 403);
+      }
     }
 
     const ketQua = ACTIONS[action](payload, ctx);
@@ -59,17 +79,13 @@ function doPost(e) {
 
   } catch (err) {
     console.error(err.stack || err.message);
-    ghiNhatKy_(req.ctx || {}, 'LOI_HE_THONG', '', '', String(err.message), 'THAT_BAI');
-    return traLoi_({ ok: false, loi: String(err.message) }, 500);
+    return traLoi_({ ok: false, loi: String(err.message) }, err.http || 400);
   }
 }
 
 /** GET chỉ dùng để kiểm tra Web App đã triển khai chưa. */
 function doGet() {
-  return traLoi_({
-    ok: true,
-    data: { ten: 'HTV KHTC API', thoi_gian: nowIso_() }
-  });
+  return traLoi_({ ok: true, data: { ten: 'HTV KHTC API', thoi_gian: nowIso_() } });
 }
 
 function traLoi_(obj, maLoi) {
@@ -81,11 +97,11 @@ function traLoi_(obj, maLoi) {
 
 /**
  * Bảng điều phối. Mỗi giai đoạn bổ sung thêm action vào đây.
- * Giai đoạn 0 chỉ có các action đủ để chứng minh đường truyền thông suốt.
  */
 const ACTIONS = {
 
-  /** Kiểm tra toàn tuyến: Vercel ➜ Apps Script ➜ Sheet. */
+  /* ----- Giai đoạn 0: kiểm tra đường truyền ----- */
+
   ping: function (payload) {
     const ss = getSpreadsheet_();
     const tabs = ss.getSheets().map(function (s) { return s.getName(); });
@@ -101,7 +117,6 @@ const ACTIONS = {
     };
   },
 
-  /** Số liệu tổng quan để trang kiểm tra hiển thị. */
   tongQuan: function () {
     return {
       don_vi: docAllRows_('DON_VI').length,
@@ -114,30 +129,57 @@ const ACTIONS = {
     };
   },
 
-  /** Ghi thử một dòng vào NHAT_KY — chứng minh đường ghi hoạt động. */
   ghiThu: function (payload, ctx) {
     const ghiChu = String((payload && payload.ghi_chu) || 'Ghi thử từ trang kiểm tra');
     ghiNhatKy_(ctx, 'GHI_THU', 'NHAT_KY', '', ghiChu, 'THANH_CONG');
     return { da_ghi: true, ghi_chu: ghiChu, thoi_gian: nowIso_() };
   },
 
-  /** Danh sách đơn vị, dùng để đối chiếu dữ liệu mẫu đã nạp đúng chưa. */
   danhSachDonVi: function () {
     return docAllRows_('DON_VI').map(function (d) {
       return { don_vi_id: d.don_vi_id, ten: d.ten, loai: d.loai, email: d.email };
     });
-  }
+  },
+
+  /* ----- Giai đoạn 1: xác thực ----- */
+
+  dangNhap: dangNhap_,
+  xacThucOtp: xacThucOtp_,
+  guiLaiOtp: guiLaiOtp_,
+  dangXuat: dangXuat_,
+  layToi: layToi_,
+  doiMatKhau: doiMatKhau_,
+  quenThietBi: quenThietBi_,
+
+  /* ----- Giai đoạn 1: quản trị ----- */
+
+  danhSachNguoiDung: danhSachNguoiDung_,
+  luuNguoiDung: luuNguoiDung_,
+  datLaiMatKhau: datLaiMatKhau_,
+  doiTrangThaiNguoiDung: doiTrangThaiNguoiDung_,
+  moKhoaNguoiDung: moKhoaNguoiDung_,
+
+  danhSachDonViDayDu: danhSachDonViDayDu_,
+  luuDonVi: luuDonVi_,
+
+  layCauHinh: layCauHinh_,
+  luuCauHinh: luuCauHinh_,
+  kiemTraThuMuc: kiemTraThuMuc_,
+  luuThuMucGoc: luuThuMucGoc_,
+  tinhTrangHeThong: tinhTrangHeThong_,
+
+  layDanhMuc: layDanhMuc_,
+  xemNhatKy: xemNhatKy_
 };
 
-/**
- * Xác thực phiên. Giai đoạn 1 sẽ cài đặt đầy đủ;
- * hiện trả về null để mọi action cần đăng nhập đều bị từ chối.
- */
+/** Xác thực phiên đăng nhập từ token trong cookie. */
 function xacThucPhien_(token) {
   if (!token) return null;
-  const hash = sha256Hex_(String(token));
-  const phien = timMot_('PHIEN', 'token_hash', hash);
+  const phien = timMot_('PHIEN', 'token_hash', sha256Hex_(String(token)));
   if (!phien || phien.trang_thai !== 'HOAT_DONG') return null;
   if (new Date(phien.het_han) < new Date()) return null;
-  return timMot_('NGUOI_DUNG', 'user_id', phien.user_id);
+
+  const user = timMot_('NGUOI_DUNG', 'user_id', phien.user_id);
+  if (!user || user.trang_thai !== 'HOAT_DONG') return null;
+  return user;
 }

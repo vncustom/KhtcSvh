@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiểm tra kết nối — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <div class="con-lai">
+      <span id="trangThaiChung" class="trang-thai cho"><span class="cham"></span>Chưa kiểm tra</span>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <div class="the" style="margin-bottom:20px">
+    <h2>Kiểm tra đường truyền — Giai đoạn 0</h2>
+    <p class="mo-ta">
+      Trang này xác nhận ba chặng đã thông: trình duyệt → tuyến trung gian trên Vercel →
+      Apps Script → file Google Sheet. Khi cả ba chặng đều xanh thì Giai đoạn 1 bắt đầu được.
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button id="nutPing" class="nut nut-chinh">Kiểm tra kết nối</button>
+      <button id="nutTongQuan" class="nut nut-phu">Đọc số liệu</button>
+      <button id="nutGhiThu" class="nut nut-phu">Ghi thử một dòng</button>
+      <button id="nutDonVi" class="nut nut-phu">Xem danh sách đơn vị</button>
+    </div>
+    <div id="baoLoi" class="thong-bao loi an" style="margin-top:16px"></div>
+  </div>
+
+  <section id="khoiChang" class="luoi c3 an" style="margin-bottom:20px">
+    <div class="the">
+      <span class="nhan">Chặng 1</span>
+      <h2>Tuyến trung gian Vercel</h2>
+      <p id="chang1" class="mo-ta" style="margin:0"></p>
+    </div>
+    <div class="the">
+      <span class="nhan">Chặng 2</span>
+      <h2>Apps Script</h2>
+      <p id="chang2" class="mo-ta" style="margin:0"></p>
+    </div>
+    <div class="the">
+      <span class="nhan">Chặng 3</span>
+      <h2>Google Sheet</h2>
+      <p id="chang3" class="mo-ta" style="margin:0"></p>
+    </div>
+  </section>
+
+  <section id="khoiSoLieu" class="luoi c4 an" style="margin-bottom:20px">
+    <div class="o-so"><div id="soDonVi" class="con-so">—</div><div class="ten">Đơn vị &amp; đối tác</div></div>
+    <div class="o-so"><div id="soNguoiDung" class="con-so">—</div><div class="ten">Tài khoản</div></div>
+    <div class="o-so"><div id="soDanhMuc" class="con-so">—</div><div class="ten">Mục danh mục</div></div>
+    <div class="o-so"><div id="soEmail" class="con-so">—</div><div class="ten">Email còn lại hôm nay</div></div>
+  </section>
+
+  <section id="khoiBang" class="the an" style="margin-bottom:20px">
+    <h2>Đơn vị đã nạp</h2>
+    <p class="mo-ta">Dữ liệu đọc trực tiếp từ tab <code>DON_VI</code> trong file Sheet.</p>
+    <div class="bang-bao">
+      <table>
+        <thead><tr><th>Mã</th><th>Tên</th><th>Loại</th><th>Email</th></tr></thead>
+        <tbody id="bangDonVi"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="the">
+    <h2>Kết quả thô</h2>
+    <p class="mo-ta">Nội dung máy chủ trả về, hữu ích khi cần chẩn đoán lỗi.</p>
+    <pre id="ketQuaTho" class="khoi-ma">Chưa có kết quả. Bấm “Kiểm tra kết nối” để bắt đầu.</pre>
+  </section>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+  · Giai đoạn 0 — trang kiểm tra nội bộ
+</footer>
+
+<script type="module" src="/js/kiemtra.js"></script>
+</body>
+</html>

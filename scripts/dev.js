@@ -1,106 +1,65 @@
 /**
- * scripts/dev.js — Máy chủ chạy thử trên máy.
+ * scripts/dev.js — Người trông máy chủ thử nghiệm.
  *
- * Phục vụ thư mục public/ và định tuyến /api/* sang đúng file trong api/,
- * giống hệt cách Vercel làm. Không cần cài Vercel CLI, không cần đăng nhập.
+ * Chạy scripts/may-chu.js trong một tiến trình con và khởi động lại nó mỗi khi
+ * mã trong api/ thay đổi. Cần làm theo cách này vì Node giữ nguyên module đã nạp
+ * trong suốt vòng đời tiến trình — sửa api/_phien.js mà không khởi động lại thì
+ * tiến trình vẫn chạy bản cũ.
+ *
+ * File trong public/ được đọc lại từ đĩa ở mỗi yêu cầu nên không cần khởi động lại.
  *
  *   npm run dev      ➜  http://localhost:3000
  */
 
-import http from 'node:http';
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 const GOC = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const TINH = path.join(GOC, 'public');
-const API = path.join(GOC, 'api');
-const CONG = Number(process.env.PORT) || 3000;
+const MAY_CHU = path.join(GOC, 'scripts', 'may-chu.js');
+const THEO_DOI = [path.join(GOC, 'api'), path.join(GOC, 'scripts')];
 
-const KIEU = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2'
-};
+let con = null;
+let hen = null;
+let dangDong = false;
 
-/** Vercel cho handler dùng res.status(n); Node thuần thì không, nên thêm vào. */
-function boSung(res) {
-  res.status = (n) => { res.statusCode = n; return res; };
-  return res;
+function chay() {
+  con = spawn(process.execPath, [MAY_CHU], { stdio: 'inherit', env: process.env });
+
+  con.on('exit', (ma) => {
+    if (dangDong) return;
+    // Cổng bị chiếm hoặc lỗi cú pháp: dừng hẳn thay vì lặp vô hạn.
+    if (ma !== null && ma !== 0) {
+      console.error(`\n  Máy chủ dừng với mã ${ma}. Sửa lỗi rồi chạy lại "npm run dev".\n`);
+      process.exit(ma);
+    }
+  });
 }
 
-async function chayApi(req, res, duongDan) {
-  const ten = duongDan.replace(/^\/api\//, '').replace(/\/$/, '') || 'index';
-
-  // Không cho gọi file dùng chung (đặt tên bắt đầu bằng _) và chặn thoát thư mục.
-  if (ten.startsWith('_') || ten.includes('..') || ten.includes('/_')) {
-    return traLoi(res, 404, { ok: false, loi: 'Không có API này.' });
-  }
-
-  const file = path.join(API, ten + '.js');
-  if (!fs.existsSync(file)) {
-    return traLoi(res, 404, { ok: false, loi: `Không có API "/api/${ten}".` });
-  }
-
-  try {
-    // Thêm tham số để Node nạp lại module sau mỗi lần sửa file, khỏi phải khởi động lại.
-    const mod = await import(pathToFileURL(file).href + '?v=' + Date.now());
-    await mod.default(req, boSung(res));
-  } catch (e) {
-    console.error(e);
-    if (!res.headersSent) traLoi(res, 500, { ok: false, loi: e.message });
-  }
+function khoiDongLai(tep) {
+  clearTimeout(hen);
+  // Trình soạn thảo thường ghi file nhiều lần liên tiếp, nên đợi một nhịp.
+  hen = setTimeout(() => {
+    console.log(`\n  ↻ ${tep} đã đổi — khởi động lại máy chủ…`);
+    if (con) con.kill('SIGTERM');
+    setTimeout(chay, 120);
+  }, 150);
 }
 
-function traLoi(res, ma, obj) {
-  res.statusCode = ma;
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.end(JSON.stringify(obj));
+for (const thuMuc of THEO_DOI) {
+  if (!fs.existsSync(thuMuc)) continue;
+  fs.watch(thuMuc, { recursive: true }, (_su, tep) => {
+    if (tep && tep.endsWith('.js')) khoiDongLai(tep);
+  });
 }
 
-function phucVuTinh(res, duongDan) {
-  let p = decodeURIComponent(duongDan.split('?')[0]);
-  if (p === '/' || p.endsWith('/')) p += 'index.html';
-
-  const file = path.join(TINH, p);
-  if (!file.startsWith(TINH)) { res.statusCode = 403; return res.end('Cấm truy cập.'); }
-
-  // cleanUrls: /trang cũng mở được trang.html
-  const thu = fs.existsSync(file) ? file
-    : fs.existsSync(file + '.html') ? file + '.html'
-    : null;
-
-  if (!thu) {
-    res.statusCode = 404;
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.end('<h1>404</h1><p>Không tìm thấy <code>' + p + '</code>.</p>');
-  }
-
-  res.setHeader('Content-Type', KIEU[path.extname(thu)] || 'application/octet-stream');
-  res.setHeader('Cache-Control', 'no-store');
-  fs.createReadStream(thu).pipe(res);
+for (const tin of ['SIGINT', 'SIGTERM']) {
+  process.on(tin, () => {
+    dangDong = true;
+    if (con) con.kill('SIGTERM');
+    process.exit(0);
+  });
 }
 
-const server = http.createServer((req, res) => {
-  const duongDan = (req.url || '/').split('?')[0];
-  if (duongDan.startsWith('/api/')) return chayApi(req, res, duongDan);
-  phucVuTinh(res, req.url || '/');
-});
-
-server.listen(CONG, () => {
-  const thieu = ['GAS_URL', 'GAS_APP_KEY', 'SESSION_SECRET'].filter((k) => !process.env[k]);
-  console.log(`\n  Cổng hồ sơ KHTC — máy chủ thử nghiệm`);
-  console.log(`  http://localhost:${CONG}\n`);
-  if (thieu.length) {
-    console.log(`  ⚠  Chưa có biến môi trường: ${thieu.join(', ')}`);
-    console.log(`     Tạo file .env.local theo mẫu .env.example rồi chạy lại.\n`);
-  } else {
-    console.log(`  ✓  Đã nạp đủ biến môi trường.\n`);
-  }
-});
+chay();

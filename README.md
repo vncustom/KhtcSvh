@@ -4,35 +4,49 @@ Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Ch
 
 Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ liệu trong Google Sheet · tài liệu trên Google Drive.
 
-**Trạng thái: Giai đoạn 0** — dựng khung và kiểm tra đường truyền. Chưa có đăng nhập, chưa có nghiệp vụ hồ sơ.
+**Trạng thái: Giai đoạn 1** — xác thực hai lớp và quản trị người dùng đã hoạt động. Nghiệp vụ hồ sơ chương trình sẽ có ở Giai đoạn 2.
 
 ---
 
 ## Cấu trúc thư mục
 
 ```
-public/           Giao diện — HTML, CSS, JS thuần, không có bước biên dịch
-  index.html        Trang kiểm tra của Giai đoạn 0
-  css/app.css       Bảng màu navy và các thành phần dùng chung
-  js/api.js         Lớp gọi API duy nhất
-  js/kiemtra.js     Điều khiển trang kiểm tra
+public/            Giao diện — HTML, CSS, JS thuần, không có bước biên dịch
+  index.html         Đăng nhập: mật khẩu ➜ mã xác thực ➜ đổi mật khẩu lần đầu
+  app.html           Bảng điều khiển
+  quan-tri.html      Người dùng · Đơn vị · Cấu hình · Nhật ký
+  kiem-tra.html      Trang kiểm tra đường truyền của Giai đoạn 0
+  css/app.css        Bảng màu navy và các thành phần dùng chung
+  js/api.js          Lớp gọi API duy nhất
+  js/khung.js        Khung trang dùng chung: người đang đăng nhập, menu, đăng xuất
+  js/dangnhap.js     js/app.js     js/quantri.js     js/kiemtra.js
 
-api/              Tuyến trung gian chạy trên Vercel (Node)
-  goi.js            Cửa duy nhất mà trình duyệt gọi
-  _gas.js           Cầu nối tới Apps Script — nơi duy nhất biết GAS_URL
-  _phien.js         Cookie phiên có ký HMAC
-  _nhipdo.js        Chặn dội yêu cầu
+api/               Tuyến trung gian chạy trên Vercel (Node)
+  goi.js             Cửa chung cho mọi action nghiệp vụ
+  dangnhap.js        Bước 1: kiểm mật khẩu, đặt cookie
+  otp.js             Bước 2: xác thực mã, gửi lại mã
+  dangxuat.js        quenthietbi.js
+  _gas.js            Cầu nối tới Apps Script — nơi duy nhất biết GAS_URL
+  _phien.js          Ba cookie httpOnly có ký HMAC
+  _nhipdo.js         Chặn dội yêu cầu
 
-apps-script/      Mã chạy trên Google Apps Script
-  Schema.gs         Định nghĩa 13 bảng
-  Config.gs         Tham số hệ thống
-  Util.gs           Băm mật khẩu, sinh mã, xử lý chuỗi tiếng Việt
-  Repo.gs           Lớp truy cập Sheet, có khoá ghi và bộ đệm
-  Log.gs            Nhật ký hệ thống
-  Setup.gs          Khởi tạo bảng và dữ liệu mẫu
-  Router.gs         Điểm vào doPost
+apps-script/       Mã chạy trên Google Apps Script
+  Schema.gs          Định nghĩa 14 bảng
+  Config.gs          Tham số hệ thống
+  Util.gs            Băm mật khẩu, sinh mã, xử lý chuỗi tiếng Việt
+  Repo.gs            Lớp truy cập Sheet, có khoá ghi và bộ đệm
+  Log.gs             Nhật ký hệ thống
+  Auth.gs            Đăng nhập, OTP, phiên, thiết bị tin cậy
+  Mail.gs            Thư OTP và thư mật khẩu mới
+  Quyen.gs           Bảng phân quyền của năm vai trò
+  NguoiDung.gs       Quản lý tài khoản và đơn vị
+  CauHinh.gs         Cấu hình, thư mục Drive, nhật ký
+  Setup.gs           Khởi tạo bảng và dữ liệu mẫu
+  Router.gs          Điểm vào doPost
 
-scripts/dev.js    Máy chủ chạy thử trên máy, không cần Vercel CLI
+scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
+  dev.js             Trông chừng và khởi động lại khi mã trong api/ thay đổi
+  may-chu.js         Máy chủ HTTP
 ```
 
 ---
@@ -43,7 +57,7 @@ scripts/dev.js    Máy chủ chạy thử trên máy, không cần Vercel CLI
 
 1. Mở [script.google.com](https://script.google.com) **bằng tài khoản Google có gói 5 TB** (tài khoản này sẽ sở hữu toàn bộ tệp Drive và hạn mức email).
 2. Bấm **Dự án mới**. Đặt tên: `HTV KHTC API`.
-3. Tạo đủ 7 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
+3. Tạo đủ 12 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
    Trong trình soạn thảo, dấu `.gs` được thêm tự động — chỉ cần gõ tên `Schema`, `Config`, …
 4. Mở **Project Settings** ➜ tích **Show "appsscript.json" manifest file**, rồi dán nội dung
    `apps-script/appsscript.json` đè lên file manifest.
@@ -66,7 +80,7 @@ Chạy lần lượt ba hàm, mỗi lần chọn tên hàm ở thanh trên rồi
 | Hàm | Việc nó làm |
 |---|---|
 | `xemAppKey` | Sinh khoá dùng chung giữa Vercel và Apps Script. **Chép giá trị in ra.** |
-| `khoiTaoCoSoDuLieu` | Tạo 13 tab, nạp danh mục, 20 đơn vị nội bộ, 2 đối tác, 23 tài khoản. **Chép ba mật khẩu in ở cuối log.** |
+| `khoiTaoCoSoDuLieu` | Tạo 14 tab, nạp danh mục, 20 đơn vị nội bộ, 2 đối tác, 23 tài khoản. **Chép ba mật khẩu in ở cuối log.** |
 | `taoThuMucGoc` | Tạo thư mục `HTV_KHTC_HoSo` trên My Drive và ghi ID vào bảng cấu hình. |
 
 Lần chạy đầu Google sẽ hỏi cấp quyền — chọn tài khoản, bấm **Advanced ➜ Go to HTV KHTC API (unsafe)**, rồi **Allow**.
@@ -108,8 +122,10 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Mở <http://localhost:3000> rồi bấm lần lượt bốn nút. Cả bốn đều xanh nghĩa là
-Giai đoạn 0 đã xong: trình duyệt → tuyến trung gian → Apps Script → Google Sheet đã thông suốt.
+Mở <http://localhost:3000/kiem-tra> rồi bấm lần lượt bốn nút. Cả bốn đều xanh nghĩa là
+đường truyền đã thông: trình duyệt → tuyến trung gian → Apps Script → Google Sheet.
+
+Sau đó mở <http://localhost:3000> để đăng nhập.
 
 ---
 
@@ -137,8 +153,9 @@ Admin không xem được mật khẩu của ai, chỉ đặt lại được.
 **Trần 100 email mỗi ngày.** Tài khoản Gmail cá nhân chỉ gửi được 100 thư/ngày qua Apps Script,
 gói Google One 5 TB không nâng con số này. Xem `email_con_lai_hom_nay` ở trang kiểm tra.
 
-**Tắt chế độ kiểm tra khi chạy thật.** Trang kiểm tra Giai đoạn 0 gọi được API mà không cần
-đăng nhập. Sang Giai đoạn 1, đặt `CHE_DO_KIEM_TRA = TAT` trong tab `CAU_HINH` để khoá lại.
+**Tắt chế độ kiểm tra khi chạy thật.** Trang `/kiem-tra` gọi được API mà không cần đăng nhập.
+Đặt `CHE_DO_KIEM_TRA = TAT` trong mục Quản trị ➜ Cấu hình để khoá lại. Bảng điều khiển
+sẽ nhắc nếu bạn quên.
 
 **File Sheet là cửa sau.** Ai có quyền mở file đều sửa được dữ liệu, vượt qua mọi kiểm tra của
 ứng dụng. Chỉ chia sẻ file cho tài khoản chạy hệ thống và một người dự phòng.
@@ -149,7 +166,29 @@ nhưng không bảo vệ được video.
 
 ---
 
+## Nâng cấp lên Giai đoạn 1
+
+Nếu đã cài xong Giai đoạn 0 thì chỉ cần ba việc:
+
+1. **Thêm 5 file mới** vào dự án Apps Script: `Auth`, `Mail`, `Quyen`, `NguoiDung`, `CauHinh`.
+   Dán đè `Schema` và `Router` bằng bản mới.
+2. **Chạy lại `khoiTaoCoSoDuLieu`** để tạo tab `OTP`. Dữ liệu cũ giữ nguyên, không tạo trùng.
+3. **Triển khai lại**: Deploy ➜ Manage deployments ➜ bấm bút chì ➜ Version: **New version** ➜ Deploy.
+   Bỏ qua bước này thì Vercel vẫn gọi bản cũ và báo *Không có action "dangNhap"*.
+
+Địa chỉ Web App không đổi, nên `.env.local` và biến môi trường trên Vercel giữ nguyên.
+
+### Đăng nhập lần đầu
+
+Vào <http://localhost:3000>, đăng nhập bằng `admin` và mật khẩu in ra ở Bước 3.
+Mã xác thực 6 số sẽ được gửi tới `patusrila@gmail.com`, sau đó hệ thống bắt đổi mật khẩu.
+
+Nếu hết hạn mức 100 email trong ngày, tạm đặt `bat_2fa` của tài khoản admin thành `FALSE`
+ngay trong tab `NGUOI_DUNG` để đăng nhập không cần mã.
+
+---
+
 ## Giai đoạn tiếp theo
 
-**Giai đoạn 1 — Xác thực và người dùng.** Đăng nhập, OTP qua email, thiết bị tin cậy 30 ngày,
-năm vai trò, màn hình quản lý người dùng, chọn thư mục Drive bằng Google Picker.
+**Giai đoạn 2 — Hồ sơ chương trình.** Thêm, sửa, tìm kiếm, phân trang;
+quy trình Nháp ➜ Chờ duyệt ➜ Đã duyệt ➜ Lưu trữ; bảng điều khiển với số liệu thật.

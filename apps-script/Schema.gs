@@ -76,12 +76,17 @@ const SCHEMA = {
     'dau_van_tay_thiet_bi', 'tin_cay_den', 'ip', 'trang_thai'
   ],
 
-  DANH_MUC: ['id', 'loai_danh_muc', 'ma', 'ten', 'thu_tu', 'dang_dung']
+  DANH_MUC: ['id', 'loai_danh_muc', 'ma', 'ten', 'thu_tu', 'dang_dung'],
+
+  OTP: [
+    'otp_id', 'loai', 'doi_tuong_id', 'email', 'ma_hash', 'salt',
+    'tao_luc', 'het_han', 'so_lan_thu', 'da_dung', 'ip'
+  ]
 };
 
 /** Thứ tự tab hiển thị trong file Sheet. */
 const THU_TU_TAB = [
   'CAU_HINH', 'DANH_MUC', 'DON_VI', 'NGUOI_DUNG',
   'HO_SO', 'HO_SO_DON_VI', 'HOP_DONG', 'THANH_TOAN', 'TEP_DINH_KEM',
-  'PHIEU_CHIA_SE', 'LUOT_TRUY_CAP', 'PHIEN', 'NHAT_KY'
+  'PHIEU_CHIA_SE', 'LUOT_TRUY_CAP', 'PHIEN', 'OTP', 'NHAT_KY'
 ];

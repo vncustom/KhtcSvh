@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản trị — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <h1 style="margin:0 0 20px;font-size:22px;font-weight:600;color:var(--navy-800)">Quản trị hệ thống</h1>
+
+  <div class="thanh-the" id="thanhThe" role="tablist"></div>
+
+  <!-- Người dùng -->
+  <section id="mucNguoiDung" class="muc an">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <input class="o-nhap" id="timNguoiDung" type="search"
+             placeholder="Tìm theo tên, tên đăng nhập hoặc đơn vị…" style="max-width:340px">
+      <select class="o-nhap" id="locNhom" style="max-width:210px">
+        <option value="">Tất cả vai trò</option>
+        <option value="ADMIN">Quản trị hệ thống</option>
+        <option value="KHTC">Ban Kế hoạch – Tài chính</option>
+        <option value="DON_VI">Đơn vị chủ quản</option>
+        <option value="DOI_TAC">Đối tác</option>
+      </select>
+      <button class="nut nut-chinh" id="nutThemNguoiDung" type="button" style="margin-left:auto">
+        Thêm tài khoản
+      </button>
+    </div>
+    <div class="bang-bao">
+      <table>
+        <thead>
+          <tr>
+            <th>Họ tên / Tên đăng nhập</th><th>Vai trò</th><th>Đơn vị</th>
+            <th>Email</th><th>Đăng nhập gần nhất</th><th>Trạng thái</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="bangNguoiDung"></tbody>
+      </table>
+    </div>
+    <p id="trongNguoiDung" class="trong an">Không có tài khoản nào khớp.</p>
+  </section>
+
+  <!-- Đơn vị -->
+  <section id="mucDonVi" class="muc an">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <input class="o-nhap" id="timDonVi" type="search"
+             placeholder="Tìm theo tên đơn vị…" style="max-width:340px">
+      <select class="o-nhap" id="locLoai" style="max-width:200px">
+        <option value="">Tất cả</option>
+        <option value="NOI_BO">Đơn vị nội bộ</option>
+        <option value="DOI_TAC">Đối tác</option>
+      </select>
+      <button class="nut nut-chinh" id="nutThemDonVi" type="button" style="margin-left:auto">
+        Thêm đơn vị
+      </button>
+    </div>
+    <div class="bang-bao">
+      <table>
+        <thead>
+          <tr><th>Tên</th><th>Loại</th><th>Đầu mối</th><th>Email</th><th>Điện thoại</th><th></th></tr>
+        </thead>
+        <tbody id="bangDonVi"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Cấu hình -->
+  <section id="mucCauHinh" class="muc an">
+    <div class="luoi c2" style="align-items:start">
+
+      <div class="the">
+        <h2>Thư mục lưu trữ trên Drive</h2>
+        <p class="mo-ta">
+          Nơi hệ thống tạo cây thư mục cho từng hồ sơ. Dán ID hoặc đường dẫn thư mục,
+          bấm kiểm tra rồi lưu.
+        </p>
+        <div id="thuMucHienTai" style="margin-bottom:14px"></div>
+        <div class="truong">
+          <label for="oThuMuc">ID hoặc đường dẫn thư mục</label>
+          <input class="o-nhap" id="oThuMuc" type="text"
+                 placeholder="https://drive.google.com/drive/folders/…">
+        </div>
+        <div class="hang-nut">
+          <button class="nut nut-phu" id="nutKiemTraThuMuc" type="button">Kiểm tra</button>
+          <button class="nut nut-chinh" id="nutLuuThuMuc" type="button" disabled>Lưu thư mục</button>
+        </div>
+        <div id="ketQuaThuMuc" style="margin-top:14px"></div>
+      </div>
+
+      <div class="the">
+        <h2>Tình trạng hệ thống</h2>
+        <p class="mo-ta">Số liệu đọc trực tiếp từ Apps Script.</p>
+        <div class="bang-bao"><table><tbody id="bangTinhTrang"></tbody></table></div>
+      </div>
+
+      <div class="the" style="grid-column:1/-1">
+        <h2>Tham số</h2>
+        <p class="mo-ta">
+          Sửa giá trị rồi bấm lưu. Các tham số về thời gian tính bằng phút, giờ hoặc ngày
+          đúng như tên gọi.
+        </p>
+        <div class="bang-bao">
+          <table>
+            <thead><tr><th style="width:230px">Tham số</th><th style="width:180px">Giá trị</th><th>Ý nghĩa</th></tr></thead>
+            <tbody id="bangCauHinh"></tbody>
+          </table>
+        </div>
+        <div class="hang-nut" style="margin-top:14px">
+          <button class="nut nut-chinh" id="nutLuuCauHinh" type="button">Lưu thay đổi</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Nhật ký -->
+  <section id="mucNhatKy" class="muc an">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <input class="o-nhap" id="timNhatKy" type="search"
+             placeholder="Tìm trong chi tiết, hành động, người thực hiện…" style="max-width:340px">
+      <select class="o-nhap" id="locHanhDong" style="max-width:220px">
+        <option value="">Mọi hành động</option>
+      </select>
+      <span id="tongNhatKy" style="margin-left:auto;font-size:13px;color:var(--chu-nhat)"></span>
+    </div>
+    <div class="bang-bao">
+      <table>
+        <thead>
+          <tr><th>Thời gian</th><th>Người thực hiện</th><th>Hành động</th>
+              <th>Chi tiết</th><th>IP</th><th>Kết quả</th></tr>
+        </thead>
+        <tbody id="bangNhatKy"></tbody>
+      </table>
+    </div>
+    <div class="hang-nut" style="margin-top:14px;justify-content:center;align-items:center">
+      <button class="nut nut-phu" id="nutTruoc" type="button">← Trước</button>
+      <span id="soTrang" style="font-size:13px;color:var(--chu-nhat);padding:0 12px"></span>
+      <button class="nut nut-phu" id="nutSau" type="button">Sau →</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<div id="vungHopThoai"></div>
+
+<script type="module" src="/js/quantri.js"></script>
+</body>
+</html>

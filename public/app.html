@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bảng điều khiển — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <h1 style="margin:0 0 4px;font-size:22px;font-weight:600;color:var(--navy-800)">
+    Chào <span id="chaoTen">…</span>
+  </h1>
+  <p style="margin:0 0 26px;font-size:14px;color:var(--chu-nhat)">
+    Hệ thống đang ở Giai đoạn 1 — phần xác thực và quản trị người dùng đã hoạt động.
+    Phần hồ sơ chương trình sẽ có ở Giai đoạn 2.
+  </p>
+
+  <section class="luoi c4" id="oSoLieu" style="margin-bottom:24px"></section>
+
+  <div class="luoi c2">
+
+    <section class="the">
+      <h2>Tài khoản của bạn</h2>
+      <p class="mo-ta">Thông tin lấy trực tiếp từ phiên đăng nhập hiện tại.</p>
+      <div class="bang-bao">
+        <table>
+          <tbody id="bangToi"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="the">
+      <h2>Quyền được cấp</h2>
+      <p class="mo-ta">Danh sách này do máy chủ quyết định, không phải giao diện.</p>
+      <div id="dsQuyen" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--duong-nhat)">
+        <h2 style="font-size:14.5px">Thiết bị tin cậy</h2>
+        <p class="mo-ta" style="margin-bottom:12px">
+          Nếu bạn đã chọn ghi nhớ máy này, hệ thống sẽ không hỏi mã xác thực trong 30 ngày.
+          Bấm nút dưới đây để huỷ ghi nhớ trên mọi máy.
+        </p>
+        <button class="nut nut-phu" id="nutQuenThietBi" type="button">Quên mọi thiết bị</button>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>

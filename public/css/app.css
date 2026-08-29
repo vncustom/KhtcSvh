@@ -347,3 +347,198 @@ code {
   .quay { animation-duration: 2s; }
   * { transition: none !important; }
 }
+
+/* ---------- Thanh điều hướng ---------- */
+
+.menu {
+  display: flex;
+  gap: 2px;
+  margin-left: 8px;
+  flex-wrap: wrap;
+}
+
+.menu-muc {
+  color: #b9cbe4;
+  text-decoration: none;
+  font-size: 13.5px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border-bottom: 2px solid transparent;
+}
+
+.menu-muc:hover { color: #fff; background: rgba(255, 255, 255, .07); }
+
+.menu-muc.dang-o {
+  color: #fff;
+  border-bottom-color: var(--dong);
+  background: rgba(255, 255, 255, .07);
+}
+
+.the-toi { text-align: right; line-height: 1.3; }
+.the-toi .ten { font-size: 13.5px; font-weight: 500; color: #fff; }
+.the-toi .vai { font-size: 11.5px; color: #a8bcd8; }
+
+.nut-thoat {
+  background: rgba(255, 255, 255, .1);
+  color: #e9eef6;
+  border: 1px solid rgba(255, 255, 255, .18);
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nut-thoat:hover { background: rgba(255, 255, 255, .18); }
+
+/* ---------- Thẻ chuyển mục ---------- */
+
+.thanh-the {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--duong);
+  margin-bottom: 22px;
+  overflow-x: auto;
+}
+
+.the-muc {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--chu-nhat);
+  padding: 9px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.the-muc:hover { color: var(--navy-700); }
+
+.the-muc.dang-o {
+  color: var(--navy-800);
+  font-weight: 600;
+  border-bottom-color: var(--dong);
+}
+
+/* ---------- Thông báo nổi ---------- */
+
+.vung-bao {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(380px, calc(100vw - 36px));
+}
+
+.bao-noi {
+  box-shadow: 0 6px 20px rgba(8, 24, 47, .16);
+  background: var(--mat);
+  animation: bao-vao .22s ease-out;
+}
+
+.bao-tan { opacity: 0; transform: translateY(6px); transition: opacity .3s, transform .3s; }
+
+@keyframes bao-vao {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Hộp thoại ---------- */
+
+.man-che {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 24, 47, .5);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.hop-thoai {
+  background: var(--mat);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(8, 24, 47, .3);
+}
+
+.hop-thoai-dau {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--duong);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hop-thoai-dau h2 { margin: 0; font-size: 16.5px; font-weight: 600; color: var(--navy-800); }
+.hop-thoai-than { padding: 20px 22px; }
+
+.hop-thoai-chan {
+  padding: 14px 22px;
+  border-top: 1px solid var(--duong);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  background: var(--mat-2);
+  border-radius: 0 0 8px 8px;
+}
+
+.nut-x {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--chu-mo);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.nut-x:hover { background: var(--mat-2); color: var(--chu); }
+
+/* ---------- Trường trong biểu mẫu ---------- */
+
+.truong { margin-bottom: 14px; }
+
+.truong label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--chu);
+}
+
+.truong .goi-y { font-size: 12.5px; color: var(--chu-mo); margin: 4px 0 0; }
+
+select.o-nhap { appearance: auto; }
+
+.hang-nut { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.nut-nho {
+  font-size: 12.5px;
+  padding: 5px 11px;
+  border-radius: 4px;
+  border: 1px solid var(--duong);
+  background: var(--mat);
+  color: var(--navy-800);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nut-nho:hover { background: var(--mat-2); border-color: var(--navy-500); }
+.nut-nho.nguy:hover { background: var(--loi-nen); border-color: var(--loi); color: var(--loi); }
+
+.trong {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--chu-mo);
+  font-size: 14px;
+}
