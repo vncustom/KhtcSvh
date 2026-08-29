@@ -127,7 +127,11 @@ function xemNhatKy_(payload, ctx) {
   const ten = {};
   docAllRows_('NGUOI_DUNG').forEach(function (u) { ten[u.user_id] = u.ho_ten; });
 
-  let ds = docAllRows_('NHAT_KY');
+  // Giới hạn phạm vi đọc để màn hình nhật ký không chậm dần theo năm tháng.
+  // Cần tra cứu xa hơn thì mở thẳng tab NHAT_KY trong file Google Sheet.
+  const SOI_TOI_DA = 8000;
+  let ds = docDongCuoi_('NHAT_KY', SOI_TOI_DA);
+  const nguon = ds;
 
   if (locHanhDong) {
     ds = ds.filter(function (r) { return r.hanh_dong === locHanhDong; });
@@ -148,7 +152,8 @@ function xemNhatKy_(payload, ctx) {
     tong: tong,
     trang: trang,
     so_trang: Math.max(1, Math.ceil(tong / moiTrang)),
-    hanh_dong_co: [...new Set(docAllRows_('NHAT_KY').map(function (r) { return r.hanh_dong; }))].sort(),
+    gioi_han_soi: SOI_TOI_DA,
+    hanh_dong_co: [...new Set(nguon.map(function (r) { return r.hanh_dong; }))].sort(),
     dong: ds.slice(batDau, batDau + moiTrang).map(function (r) {
       return {
         thoi_gian: r.thoi_gian,

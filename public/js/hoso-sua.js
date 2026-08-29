@@ -19,7 +19,15 @@ let danhMuc = {};
 const cho_ = { tep: [], link: [] };
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/ho-so' });
+  let g;
+  try {
+    g = await api('moTrang', { trang: 'BIEU_MAU', ho_so_id: maHoSo || undefined });
+  } catch (e) {
+    chu($('dangTai'), e.message);
+    return;
+  }
+
+  const me = await dungKhung({ trangHienTai: '/ho-so', toi: g.toi });
   if (!me) return;
 
   if (!maHoSo && !coQuyen('ho_so.them')) {
@@ -27,18 +35,13 @@ const cho_ = { tep: [], link: [] };
     return;
   }
 
-  try {
-    [danhMuc, donViTatCa] = await Promise.all([api('layDanhMuc'), api('danhSachDonViDayDu')]);
-  } catch (e) {
-    chu($('dangTai'), e.message);
-    return;
-  }
-
+  danhMuc = g.danh_muc || {};
+  donViTatCa = g.don_vi || [];
   napLuaChon(me);
 
   if (maHoSo) {
     try {
-      await napHoSoCu();
+      napHoSoCu(g.chi_tiet);
     } catch (e) {
       chu($('dangTai'), e.message);
       return;
@@ -90,8 +93,8 @@ function themMuc(sel, ds) {
 
 /* ---------- Nạp hồ sơ đang sửa ---------- */
 
-async function napHoSoCu() {
-  const d = await api('chiTietHoSo', { ho_so_id: maHoSo });
+function napHoSoCu(d) {
+  if (!d) throw new Error('Không tìm thấy hồ sơ.');
   if (!d.duoc_lam.sua) throw new Error('Bạn không có quyền sửa hồ sơ này.');
 
   const h = d.ho_so;

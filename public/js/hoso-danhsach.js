@@ -13,31 +13,42 @@ let danhMuc = {};
 /* ---------- Khởi động ---------- */
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/ho-so' });
+  // Cho phép mở sẵn một bộ lọc từ địa chỉ, ví dụ /ho-so?trang_thai=CHO_DUYET
+  const tham = new URLSearchParams(location.search);
+  if (tham.get('trang_thai')) loc.trang_thai = tham.get('trang_thai');
+
+  // Một lời gọi lấy cả người dùng, danh mục, đơn vị và trang hồ sơ đầu tiên.
+  let g;
+  try {
+    g = await api('moTrang', { trang: 'HO_SO', loc: docLoc() });
+  } catch (e) {
+    bao(e.message, 'loi', 7);
+    return;
+  }
+
+  const me = await dungKhung({ trangHienTai: '/ho-so', toi: g.toi });
   if (!me) return;
 
   const duocThem = coQuyen('ho_so.them');
   $('nutThem').classList.toggle('an', !duocThem);
   $('nutNhapExcel').classList.toggle('an', !duocThem);
 
-  // Cho phép mở sẵn một bộ lọc từ địa chỉ, ví dụ /ho-so?trang_thai=CHO_DUYET
-  const tham = new URLSearchParams(location.search);
-  if (tham.get('trang_thai')) loc.trang_thai = tham.get('trang_thai');
+  danhMuc = g.danh_muc || {};
+  themLuaChon($('fKenh'), (danhMuc.KENH || []).map((k) => [k.ma, k.ten]));
+  themLuaChon($('fTheLoai'), (danhMuc.THE_LOAI || []).map((k) => [k.ma, k.ten]));
+  themLuaChon($('fDonVi'), (g.don_vi || []).map((d) => [d.don_vi_id, d.ten]));
 
-  await napDanhMuc();
-  await nap();
+  ve(g.danh_sach);
 })();
 
-async function napDanhMuc() {
-  const [dm, donVi] = await Promise.all([
-    api('layDanhMuc'),
-    coQuyen('don_vi.xem') ? api('danhSachDonViDayDu') : Promise.resolve([])
-  ]);
-  danhMuc = dm;
-
-  themLuaChon($('fKenh'), (dm.KENH || []).map((k) => [k.ma, k.ten]));
-  themLuaChon($('fTheLoai'), (dm.THE_LOAI || []).map((k) => [k.ma, k.ten]));
-  themLuaChon($('fDonVi'), donVi.map((d) => [d.don_vi_id, d.ten]));
+function docLoc() {
+  return {
+    ...loc,
+    tu_khoa: $('fTuKhoa').value,
+    don_vi_id: $('fDonVi').value,
+    kenh: $('fKenh').value,
+    the_loai: $('fTheLoai').value
+  };
 }
 
 function themLuaChon(sel, cap) {
@@ -54,18 +65,15 @@ function themLuaChon(sel, cap) {
 async function nap() {
   let d;
   try {
-    d = await api('danhSachHoSo', {
-      ...loc,
-      tu_khoa: $('fTuKhoa').value,
-      don_vi_id: $('fDonVi').value,
-      kenh: $('fKenh').value,
-      the_loai: $('fTheLoai').value
-    });
+    d = await api('danhSachHoSo', docLoc());
   } catch (e) {
     bao(e.message, 'loi', 7);
     return;
   }
+  ve(d);
+}
 
+function ve(d) {
   veLocNhanh(d.thong_ke);
   veBang(d.dong);
 
@@ -215,16 +223,7 @@ $('nutNhapExcel').addEventListener('click', () => { location.href = '/nhap-excel
 
 $('nutXuatExcel').addEventListener('click', (ev) => cho(ev.currentTarget, async () => {
   // Xuất đúng bộ lọc đang xem, không chỉ trang hiện tại.
-  const r = await api('xuatExcel', {
-    loai: 'HO_SO',
-    loc: {
-      ...loc,
-      tu_khoa: $('fTuKhoa').value,
-      don_vi_id: $('fDonVi').value,
-      kenh: $('fKenh').value,
-      the_loai: $('fTheLoai').value
-    }
-  });
+  const r = await api('xuatExcel', { loai: 'HO_SO', loc: docLoc() });
   taiVe(r.ten_tep, r.du_lieu);
   bao('Đã tạo tệp ' + r.ten_tep);
 }));

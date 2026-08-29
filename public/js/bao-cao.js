@@ -11,7 +11,15 @@ import { taiVe } from './taive.js';
 let ketQua = null;
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/bao-cao' });
+  let g;
+  try {
+    g = await api('moTrang', { trang: 'BAO_CAO', loc: docLoc() });
+  } catch (e) {
+    bao(e.message, 'loi', 7);
+    return;
+  }
+
+  const me = await dungKhung({ trangHienTai: '/bao-cao', toi: g.toi });
   if (!me) return;
 
   if (!coQuyen('bao_cao.xem')) {
@@ -19,18 +27,16 @@ let ketQua = null;
     return;
   }
 
-  try {
-    for (const d of await api('danhSachDonViDayDu')) {
-      if (d.loai !== 'NOI_BO') continue;
-      const o = document.createElement('option');
-      o.value = d.don_vi_id;
-      o.textContent = d.ten;
-      $('fDonVi').append(o);
-    }
-  } catch (e) { /* đơn vị chủ quản không đọc được danh sách thì vẫn xem báo cáo được */ }
+  for (const d of (g.don_vi || [])) {
+    if (d.loai !== 'NOI_BO') continue;
+    const o = document.createElement('option');
+    o.value = d.don_vi_id;
+    o.textContent = d.ten;
+    $('fDonVi').append(o);
+  }
 
   veLocNhanhKy();
-  await nap();
+  ve(g.bao_cao);
 })();
 
 /* ---------- Lọc nhanh theo kỳ ---------- */
@@ -82,6 +88,10 @@ async function nap() {
     return;
   }
 
+  ve(d);
+}
+
+function ve(d) {
   ketQua = d;
   veSoLieu(d);
   veNhom('bangDonVi', d.theo_don_vi);

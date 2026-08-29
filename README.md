@@ -420,6 +420,48 @@ vai trò của người đang đăng nhập. Nút *In / Lưu PDF* in cả bốn 
 
 ---
 
+## Vì sao app phản hồi chậm, và đã làm gì
+
+Mỗi lời gọi tới Apps Script tốn khoảng **1,6 – 3,8 giây** (đo tại chỗ, trung bình ~2 giây).
+Phần lớn là chi phí khởi động của Apps Script, không phải đọc dữ liệu — chặng Vercel chỉ
+mất ~3 ms và file tĩnh ~8 ms. Nói cách khác: số **lời gọi** mới là thứ quyết định, không
+phải khối lượng dữ liệu.
+
+Ban đầu mỗi trang gọi nhiều lần và phần lớn là tuần tự:
+
+| Trang | Trước | Sau |
+|---|---|---|
+| Chi tiết hồ sơ | 7 lời gọi (~14 giây) | 1 |
+| Danh sách hồ sơ | 4 | 1 |
+| Quản trị | 3 khi mở, tối đa 14 khi chuyển mục | 1 |
+| Bảng điều khiển · Báo cáo · Hợp đồng · Biểu mẫu · Nhập Excel | 2–4 mỗi trang | 1 |
+
+**Cách khắc phục.** Thêm một action `moTrang` gom mọi thứ một trang cần vào đúng một lời gọi
+(`apps-script/MoTrang.gs`). Trong cùng một lần chạy, các bảng đã đọc còn nằm sẵn trong bộ đệm
+nên gộp gần như không tốn thêm thời gian. Một phần bị từ chối quyền không làm hỏng cả trang:
+ví dụ tài khoản đối tác không đọc được danh sách đơn vị nhưng vẫn xem được hồ sơ.
+
+**Hai chỗ sẽ chậm dần theo thời gian, đã chặn trước:**
+
+- Trang chi tiết hồ sơ trước đây đọc **toàn bộ** bảng nhật ký để lọc ra vài dòng của
+  hồ sơ đó. Nay chỉ đọc 4.000 dòng cuối bằng `docDongCuoi_` — chi phí không tăng theo
+  số bản ghi đã tích luỹ. Màn hình nhật ký cũng giới hạn ở 8.000 dòng gần nhất;
+  cần tra cứu xa hơn thì mở thẳng tab `NHAT_KY` trong file Sheet.
+- Bảng `NHAT_KY` và `LUOT_TRUY_CAP` không còn được đưa vào bộ đệm. Bộ đệm Apps Script
+  chỉ nhận 100 KB mỗi khoá nên với hai bảng này việc đóng gói chắc chắn thất bại —
+  chỉ tốn công vô ích ở mỗi lần gọi.
+
+**Khu vực máy chủ Vercel** đặt thành `sin1` (Singapore) trong `vercel.json`. Mặc định là
+`iad1` ở Mỹ, nghĩa là mỗi lời gọi từ Việt Nam đi vòng qua Mỹ rồi mới sang Google.
+
+### Còn có thể nhanh hơn nữa không
+
+Được, nhưng phải đổi kiến trúc: khoảng hai giây cho mỗi lời gọi là chi phí cố định của
+Apps Script, không tối ưu bằng mã nguồn được. Nếu sau này thấy vẫn chậm, hướng đi là
+chuyển tầng dữ liệu sang Cloud SQL hoặc Firestore và giữ nguyên giao diện.
+
+---
+
 ## Kiểm thử
 
 ```bash

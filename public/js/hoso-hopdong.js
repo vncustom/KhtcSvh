@@ -29,11 +29,19 @@ let duocSua = false;
 
 /* ---------- Nạp cho một hồ sơ ---------- */
 
-export async function napHopDong(hoSoId, danhSachDonVi) {
+export async function napHopDong(hoSoId, danhSachDonVi, coSan) {
   maHoSo = hoSoId;
   donViTatCa = danhSachDonVi || donViTatCa;
 
-  let d;
+  let d = coSan;
+  if (d) {
+    duocSua = d.duoc_sua;
+    veNutHopDong();
+    veDanhSachHopDong($('dsHopDong'), d.dong, { hienChuongTrinh: false });
+    chu($('demHopDong'), d.tong ? `${d.tong} hợp đồng · ${tien(d.thong_ke.tong_gia_tri)}` : '');
+    return;
+  }
+
   try {
     d = await api('hopDongCuaHoSo', { ho_so_id: hoSoId });
   } catch (e) {

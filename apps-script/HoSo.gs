@@ -209,7 +209,9 @@ function chiTietHoSo_(payload, ctx) {
     return { don_vi_id: r.don_vi_id, ten: tenDonVi[r.don_vi_id] || '', vai_tro: r.vai_tro };
   });
 
-  const nhatKy = loc_('NHAT_KY', function (r) {
+  // Chỉ soi phần đuôi của nhật ký: hoạt động của một hồ sơ luôn nằm gần cuối,
+  // và đọc cả bảng sẽ chậm dần theo số bản ghi đã tích luỹ.
+  const nhatKy = docDongCuoi_('NHAT_KY', 4000).filter(function (r) {
     return String(r.doi_tuong_id) === String(h.ho_so_id);
   });
   nhatKy.sort(function (a, b) { return new Date(b.thoi_gian) - new Date(a.thoi_gian); });

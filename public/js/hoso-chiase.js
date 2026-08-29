@@ -16,18 +16,21 @@ let donViDoiTac = [];
 
 /* ---------- Nạp ---------- */
 
-export async function napChiaSe(hoSoId, ten, doiTac) {
+export async function napChiaSe(hoSoId, ten, doiTac, coSan) {
   maHoSo = hoSoId;
   tenHoSo = ten || '';
   if (doiTac) donViDoiTac = doiTac;
 
-  let d;
-  try {
-    d = await api('danhSachPhieu', { ho_so_id: hoSoId });
-  } catch (e) {
-    $('khoiChiaSe')?.classList.add('an');
-    return;
+  let d = coSan;
+  if (!d) {
+    try {
+      d = await api('danhSachPhieu', { ho_so_id: hoSoId });
+    } catch (e) {
+      $('khoiChiaSe')?.classList.add('an');
+      return;
+    }
   }
+  if (!d) { $('khoiChiaSe')?.classList.add('an'); return; }
 
   veNut(d);
   veDanhSach(d);

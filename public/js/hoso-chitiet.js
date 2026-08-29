@@ -12,42 +12,45 @@ import { napChiaSe } from './hoso-chiase.js';
 const maHoSo = maHoSoTuUrl();
 let danhMuc = {};
 let danhSachDonVi = [];
+let daDungKhung = false;
+let goiY = {};
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/ho-so' });
-  if (!me) return;
-
   if (!maHoSo) {
     chu($('dangTai'), 'Địa chỉ thiếu mã hồ sơ.');
     return;
   }
 
-  danhMuc = await api('layDanhMuc');
-
-  // Danh sách đơn vị dùng cho hộp thoại hợp đồng và phiếu chia sẻ;
-  // tài khoản đối tác không có quyền đọc nên bỏ qua trong im lặng.
-  try {
-    danhSachDonVi = await api('danhSachDonViDayDu');
-  } catch (e) {
-    danhSachDonVi = [];
-  }
-  datDonVi(danhSachDonVi);
-
   await nap();
 })();
 
+/**
+ * Một lời gọi lấy hết mọi thứ trang này cần.
+ * Trước đây trang gọi bảy lần, mỗi lần tốn khoảng hai giây.
+ */
 async function nap() {
-  let d;
+  let g;
   try {
-    d = await api('chiTietHoSo', { ho_so_id: maHoSo });
+    g = await api('moTrang', { trang: 'CHI_TIET', ho_so_id: maHoSo });
   } catch (e) {
     chu($('dangTai'), e.message);
     return;
   }
 
+  if (!daDungKhung) {
+    const me = await dungKhung({ trangHienTai: '/ho-so', toi: g.toi });
+    if (!me) return;
+    daDungKhung = true;
+  }
+
+  danhMuc = g.danh_muc || {};
+  danhSachDonVi = g.don_vi || [];
+  datDonVi(danhSachDonVi);
+  goiY = g;
+
   $('dangTai').classList.add('an');
   $('noiDung').classList.remove('an');
-  ve(d);
+  ve(g.chi_tiet);
 }
 
 /** Đổi mã danh mục thành tên đọc được, ví dụ GAMESHOW ➜ Gameshow – Âm nhạc. */
@@ -100,10 +103,13 @@ function ve(d) {
 
   veDoiTac(d.doi_tac);
   veThuMuc(h);
-  napTep(h.ho_so_id);
-  napHopDong(h.ho_so_id);
+  napTep(h.ho_so_id, goiY.tep);
+  napHopDong(h.ho_so_id, danhSachDonVi, goiY.hop_dong);
   napChiaSe(h.ho_so_id, h.ten_chuong_trinh,
-    danhSachDonVi.filter((d) => d.loai === 'DOI_TAC'));
+    danhSachDonVi.filter((d) => d.loai === 'DOI_TAC'), goiY.chia_se);
+
+  // Những lần vẽ lại sau khi đổi trạng thái phải lấy dữ liệu mới, không dùng lại bản cũ.
+  goiY = {};
   veNhatKy(d.nhat_ky);
   veHanhDong(d.duoc_lam, h);
 }

@@ -11,6 +11,15 @@
 
 const CACHE_GIAY = 60;
 
+/**
+ * Bảng chỉ ghi thêm và lớn dần theo thời gian.
+ *
+ * Bộ đệm của Apps Script chỉ nhận 100KB mỗi khoá, nên với các bảng này việc
+ * đóng gói rồi cất vào bộ đệm chắc chắn thất bại — chỉ tốn công vô ích.
+ * Đọc chúng nên dùng docDongCuoi_ thay vì đọc cả bảng.
+ */
+const BANG_KHONG_DEM = ['NHAT_KY', 'LUOT_TRUY_CAP'];
+
 function sheet_(tab) {
   const sh = getSpreadsheet_().getSheetByName(tab);
   if (!sh) throw new Error('Chưa có tab "' + tab + '". Hãy chạy khoiTaoCoSoDuLieu() một lần.');
@@ -110,8 +119,43 @@ function docAllRows_(tab, boQuaCache) {
     return String(o[khoaChinh] == null ? '' : o[khoaChinh]).length > 0;
   });
 
-  try { cache.put(khoa, JSON.stringify(rows), CACHE_GIAY); } catch (e) { /* quá 100KB thì thôi */ }
+  if (BANG_KHONG_DEM.indexOf(tab) < 0) {
+    try { cache.put(khoa, JSON.stringify(rows), CACHE_GIAY); } catch (e) { /* quá 100KB thì thôi */ }
+  }
   return rows;
+}
+
+/**
+ * Đọc N dòng cuối của một bảng, không đụng tới phần còn lại.
+ *
+ * Nhật ký và lượt truy cập chỉ ghi thêm và luôn được xem theo thứ tự mới nhất
+ * trước, nên đọc phần đuôi là đủ mà chi phí không tăng theo số dòng đã tích luỹ.
+ */
+function docDongCuoi_(tab, soDong) {
+  const sh = sheet_(tab);
+  const tong = sh.getLastRow();
+  if (tong < 2) return [];
+
+  const lay = Math.min(Number(soDong) || 1000, tong - 1);
+  const batDau = tong - lay + 1;
+  const cot = cotSheet_(tab);
+
+  return sh.getRange(batDau, 1, lay, cot.length).getValues()
+    .map(function (r, i) {
+      const o = { _dong: batDau + i };
+      cot.forEach(function (ten, c) {
+        if (!ten) return;
+        const v = r[c];
+        o[ten] = (v instanceof Date)
+          ? Utilities.formatDate(v, 'Asia/Ho_Chi_Minh', "yyyy-MM-dd'T'HH:mm:ss")
+          : v;
+      });
+      return o;
+    })
+    .filter(function (o) {
+      const k = cotCua_(tab)[0];
+      return String(o[k] == null ? '' : o[k]).length > 0;
+    });
 }
 
 function xoaCache_(tab) {

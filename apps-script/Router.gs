@@ -225,7 +225,11 @@ const ACTIONS = {
   /* ----- Giai đoạn 5: báo cáo ----- */
 
   baoCaoTongHop: baoCaoTongHop_,
-  xuatExcel: xuatExcel_
+  xuatExcel: xuatExcel_,
+
+  /* ----- Gộp lời gọi khi mở trang ----- */
+
+  moTrang: moTrang_
 };
 
 /** Xác thực phiên đăng nhập từ token trong cookie. */

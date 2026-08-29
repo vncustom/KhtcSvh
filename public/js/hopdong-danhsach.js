@@ -10,7 +10,15 @@ const loc = { trang: 1, moi_trang: 20 };
 let locNhanh = '';
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/hop-dong' });
+  let g;
+  try {
+    g = await api('moTrang', { trang: 'HOP_DONG', loc: docLoc() });
+  } catch (e) {
+    bao(e.message, 'loi', 7);
+    return;
+  }
+
+  const me = await dungKhung({ trangHienTai: '/hop-dong', toi: g.toi });
   if (!me) return;
 
   if (!coQuyen('hop_dong.xem') && !coQuyen('hop_dong.xem_cua_minh')) {
@@ -18,40 +26,43 @@ let locNhanh = '';
     return;
   }
 
-  try {
-    const dv = await api('danhSachDonViDayDu');
-    datDonVi(dv);
-    for (const d of dv) {
-      const o = document.createElement('option');
-      o.value = d.don_vi_id;
-      o.textContent = d.ten;
-      $('fDonVi').append(o);
-    }
-  } catch (e) {
-    datDonVi([]);
+  const dv = g.don_vi || [];
+  datDonVi(dv);
+  for (const d of dv) {
+    const o = document.createElement('option');
+    o.value = d.don_vi_id;
+    o.textContent = d.ten;
+    $('fDonVi').append(o);
   }
 
   datHamLamMoi(nap);
-  await nap();
+  ve(g.danh_sach);
 })();
+
+function docLoc() {
+  return {
+    ...loc,
+    tu_khoa: $('fTuKhoa').value,
+    don_vi_id: $('fDonVi').value,
+    loai: $('fLoai').value,
+    trang_thai: $('fTrangThai').value,
+    sap_het_han: locNhanh === 'sap_het_han' || undefined,
+    qua_han: locNhanh === 'qua_han' || undefined
+  };
+}
 
 async function nap() {
   let d;
   try {
-    d = await api('danhSachHopDong', {
-      ...loc,
-      tu_khoa: $('fTuKhoa').value,
-      don_vi_id: $('fDonVi').value,
-      loai: $('fLoai').value,
-      trang_thai: $('fTrangThai').value,
-      sap_het_han: locNhanh === 'sap_het_han' || undefined,
-      qua_han: locNhanh === 'qua_han' || undefined
-    });
+    d = await api('danhSachHopDong', docLoc());
   } catch (e) {
     bao(e.message, 'loi', 7);
     return;
   }
+  ve(d);
+}
 
+function ve(d) {
   datDuocSua(d.duoc_sua);
   veSoLieu(d.thong_ke);
   veLocNhanh(d.thong_ke);

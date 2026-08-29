@@ -22,15 +22,17 @@ let trangThai = { duoc_tai_len: false, duoc_xoa: false, nguong_truc_tiep: 3 * 10
 
 /* ---------- Nạp và vẽ ---------- */
 
-export async function napTep(hoSoId) {
+export async function napTep(hoSoId, coSan) {
   maHoSo = hoSoId;
 
-  let d;
-  try {
-    d = await api('danhSachTep', { ho_so_id: maHoSo });
-  } catch (e) {
-    bao(e.message, 'loi', 7);
-    return;
+  let d = coSan;
+  if (!d) {
+    try {
+      d = await api('danhSachTep', { ho_so_id: maHoSo });
+    } catch (e) {
+      bao(e.message, 'loi', 7);
+      return;
+    }
   }
 
   trangThai = d;

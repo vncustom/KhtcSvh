@@ -141,7 +141,7 @@ function danhSachPhieu_(payload, ctx) {
   docAllRows_('NGUOI_DUNG').forEach(function (u) { tenNguoi[u.user_id] = u.ho_ten; });
 
   const luot = {};
-  docAllRows_('LUOT_TRUY_CAP').forEach(function (l) {
+  docDongCuoi_('LUOT_TRUY_CAP', 4000).forEach(function (l) {
     (luot[l.share_id] = luot[l.share_id] || []).push(l);
   });
 

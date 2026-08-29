@@ -16,7 +16,15 @@ let donViTatCa = [];
 let locHienTai = '';
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/ho-so' });
+  let g;
+  try {
+    g = await api('moTrang', { trang: 'NHAP_EXCEL' });
+  } catch (e) {
+    bao(e.message, 'loi', 7);
+    return;
+  }
+
+  const me = await dungKhung({ trangHienTai: '/ho-so', toi: g.toi });
   if (!me) return;
 
   if (!coQuyen('ho_so.them')) {
@@ -25,7 +33,8 @@ let locHienTai = '';
     return;
   }
 
-  [danhMuc, donViTatCa] = await Promise.all([api('layDanhMuc'), api('danhSachDonViDayDu')]);
+  danhMuc = g.danh_muc || {};
+  donViTatCa = g.don_vi || [];
 })();
 
 /* ---------- Bước 1: chọn phiếu ---------- */

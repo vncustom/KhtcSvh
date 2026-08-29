@@ -37,27 +37,31 @@ const NHAN_QUYEN = {
 };
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/app' });
+  let g;
+  try {
+    g = await api('moTrang', { trang: 'BANG_DIEU_KHIEN' });
+  } catch (e) {
+    bao(e.message, 'loi', 7);
+    return;
+  }
+
+  const me = await dungKhung({ trangHienTai: '/app', toi: g.toi });
   if (!me) return;
 
   chu($('chaoTen'), me.ho_ten);
   veBangToi(me);
   veQuyen(me);
 
-  try {
-    const d = await api('bangDieuKhien');
-    veSoLieu(d);
-    veCanLam(d);
-    veTheoTrangThai(d.theo_trang_thai);
-    veTheoDonVi(d.top_don_vi);
-    veMoiNhat(d.moi_nhat);
-    veHopDong(d.hop_dong);
-    $('nutTaoHoSo').classList.toggle('an', !d.duoc_them);
-  } catch (e) {
-    bao(e.message, 'loi', 7);
-  }
+  const d = g.bang;
+  veSoLieu(d);
+  veCanLam(d);
+  veTheoTrangThai(d.theo_trang_thai);
+  veTheoDonVi(d.top_don_vi);
+  veMoiNhat(d.moi_nhat);
+  veHopDong(d.hop_dong);
+  $('nutTaoHoSo').classList.toggle('an', !d.duoc_them);
 
-  if (coQuyen('cau_hinh.xem')) nhacCheDoKiemTra();
+  nhacTinhTrang(g.tinh_trang);
 })();
 
 /* ---------- Ô số liệu ---------- */
@@ -344,17 +348,15 @@ function veQuyen(me) {
   }
 }
 
-async function nhacCheDoKiemTra() {
-  try {
-    const t = await api('tinhTrangHeThong');
-    if (t.che_do_kiem_tra) {
-      bao('Chế độ kiểm tra đang bật — một số API gọi được mà không cần đăng nhập. '
-        + 'Hãy tắt trong mục Quản trị ➜ Cấu hình trước khi dùng thật.', 'canh-bao', 9);
-    }
-    if (t.email_con_lai <= t.email_nguong_canh_bao) {
-      bao(`Chỉ còn ${t.email_con_lai} lượt gửi email trong hôm nay.`, 'canh-bao', 8);
-    }
-  } catch { /* không có quyền thì thôi */ }
+function nhacTinhTrang(t) {
+  if (!t) return;
+  if (t.che_do_kiem_tra) {
+    bao('Chế độ kiểm tra đang bật — một số API gọi được mà không cần đăng nhập. '
+      + 'Hãy tắt trong mục Quản trị ➜ Cấu hình trước khi dùng thật.', 'canh-bao', 9);
+  }
+  if (t.email_con_lai <= t.email_nguong_canh_bao) {
+    bao(`Chỉ còn ${t.email_con_lai} lượt gửi email trong hôm nay.`, 'canh-bao', 8);
+  }
 }
 
 /* ---------- Nút ---------- */

@@ -14,12 +14,26 @@ const MUC = [
 ];
 
 const kho = { nguoiDung: [], donVi: [], cauHinh: [], trangNhatKy: 1 };
+let moDau = null;
 
 /* ---------- Khởi động ---------- */
 
 (async function batDau() {
-  const me = await dungKhung({ trangHienTai: '/quan-tri' });
+  let g;
+  try {
+    g = await api('moTrang', { trang: 'QUAN_TRI' });
+  } catch (e) {
+    bao(e.message, 'loi', 7);
+    return;
+  }
+
+  const me = await dungKhung({ trangHienTai: '/quan-tri', toi: g.toi });
   if (!me) return;
+
+  // Dữ liệu của cả bốn mục đã có sẵn từ lượt gọi trên, khỏi hỏi lại từng mục.
+  if (g.nguoi_dung) kho.nguoiDung = g.nguoi_dung;
+  if (g.don_vi) kho.donVi = g.don_vi;
+  moDau = g;
 
   const duoc = MUC.filter((m) => coQuyen(m.quyen));
   if (!duoc.length) {
@@ -98,9 +112,13 @@ function hangNut(...nut) {
 /* ================= NGƯỜI DÙNG ================= */
 
 async function napNguoiDung() {
-  kho.nguoiDung = await api('danhSachNguoiDung');
-  if (!kho.donVi.length && coQuyen('don_vi.xem')) {
-    kho.donVi = await api('danhSachDonViDayDu');
+  if (moDau?.nguoi_dung) {
+    moDau = { ...moDau, nguoi_dung: null };   // chỉ dùng cho lần vẽ đầu tiên
+  } else {
+    kho.nguoiDung = await api('danhSachNguoiDung');
+    if (!kho.donVi.length && coQuyen('don_vi.xem')) {
+      kho.donVi = await api('danhSachDonViDayDu');
+    }
   }
   veNguoiDung();
 }
@@ -265,7 +283,11 @@ function hienMatKhauTam(u, r) {
 /* ================= ĐƠN VỊ ================= */
 
 async function napDonVi() {
-  kho.donVi = await api('danhSachDonViDayDu');
+  if (moDau?.don_vi) {
+    moDau = { ...moDau, don_vi: null };
+  } else {
+    kho.donVi = await api('danhSachDonViDayDu');
+  }
   veDonVi();
 }
 
@@ -354,7 +376,14 @@ function moHopThoaiDonVi(d) {
 /* ================= CẤU HÌNH ================= */
 
 async function napCauHinh() {
-  const [ds, tt] = await Promise.all([api('layCauHinh'), api('tinhTrangHeThong')]);
+  let ds, tt;
+  if (moDau?.cau_hinh && moDau?.tinh_trang) {
+    ds = moDau.cau_hinh;
+    tt = moDau.tinh_trang;
+    moDau = { ...moDau, cau_hinh: null, tinh_trang: null };
+  } else {
+    [ds, tt] = await Promise.all([api('layCauHinh'), api('tinhTrangHeThong')]);
+  }
   kho.cauHinh = ds;
 
   const tbody = $('bangCauHinh');

@@ -22,13 +22,19 @@ export let toi = null;
  * Nạp thông tin người đang đăng nhập và dựng khung trang.
  * Chưa đăng nhập thì tự chuyển về trang đăng nhập kèm đường dẫn để quay lại.
  */
-export async function dungKhung({ trangHienTai } = {}) {
-  try {
-    toi = await goi('layToi');
-  } catch (e) {
-    if (e.maLoi === 'HET_PHIEN') return veDangNhap('het_phien');
-    if (e.maLoi === 'BUOC_DOI_MK') { location.href = '/?buoc=doi_mk'; return null; }
-    throw e;
+export async function dungKhung({ trangHienTai, toi: coSan } = {}) {
+  // Trang nào đã lấy thông tin người dùng kèm dữ liệu của mình thì truyền vào đây,
+  // để không tốn thêm một lần gọi Apps Script chỉ để hỏi lại đúng thứ đó.
+  if (coSan) {
+    toi = coSan;
+  } else {
+    try {
+      toi = await goi('layToi');
+    } catch (e) {
+      if (e.maLoi === 'HET_PHIEN') return veDangNhap('het_phien');
+      if (e.maLoi === 'BUOC_DOI_MK') { location.href = '/?buoc=doi_mk'; return null; }
+      throw e;
+    }
   }
 
   chu($('tenNguoiDung'), toi.ho_ten);
