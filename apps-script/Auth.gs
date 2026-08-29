@@ -384,6 +384,15 @@ function donDepPhienHetHan() {
     dem++;
   });
 
+  // Phiếu chia sẻ hết hạn thì bỏ luôn token và PIN đang cất ở Script Properties.
+  loc_('PHIEU_CHIA_SE', function (p) {
+    return p.trang_thai === 'HOAT_DONG' && new Date(p.het_han) < bayGio;
+  }).forEach(function (p) {
+    capNhat_('PHIEU_CHIA_SE', p.share_id, { trang_thai: 'HET_HAN' });
+    xoaBiMatPhieu_(p.share_id);
+    dem++;
+  });
+
   console.log('Đã dọn ' + dem + ' bản ghi hết hạn.');
   return dem;
 }

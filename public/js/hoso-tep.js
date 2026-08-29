@@ -186,9 +186,13 @@ function moHopThoaiTaiLen(tepList) {
           <input class="o-nhap" id="tMoTa" placeholder="Không bắt buộc">
         </div>
         <label style="display:flex;gap:8px;align-items:flex-start;font-size:13.5px">
-          <input type="checkbox" id="tChoDoiTac" style="margin-top:3px">
+          <input type="checkbox" id="tChoDoiTac" style="margin-top:3px" checked>
           <span>Cho đối tác xem được tệp này khi hồ sơ đã duyệt</span>
         </label>
+        <p class="goi-y" style="margin:6px 0 0 26px">
+          Bật ô này thì tệp được đặt sang chế độ ai có link cũng xem được trên Drive,
+          nhưng chặn tải xuống và in. Tắt đi là tệp trở lại riêng tư ngay.
+        </p>
         <div id="tTienTrinh" style="margin-top:16px"></div>
       </div>
       <div class="hop-thoai-chan">
@@ -352,7 +356,7 @@ function moHopThoaiLink() {
           <input class="o-nhap" id="lMoTa" placeholder="Không bắt buộc">
         </div>
         <label style="display:flex;gap:8px;align-items:flex-start;font-size:13.5px;margin-bottom:10px">
-          <input type="checkbox" id="lChoDoiTac" style="margin-top:3px">
+          <input type="checkbox" id="lChoDoiTac" style="margin-top:3px" checked>
           <span>Cho đối tác xem được tệp này khi hồ sơ đã duyệt</span>
         </label>
         <label style="display:flex;gap:8px;align-items:flex-start;font-size:13.5px">

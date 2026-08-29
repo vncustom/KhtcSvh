@@ -242,6 +242,11 @@ function capNhatTep_(payload, ctx) {
   if (!Object.keys(patch).length) return { da_luu: false };
 
   capNhat_('TEP_DINH_KEM', t.file_id, patch);
+
+  if ('cho_doi_tac_xem' in patch) {
+    dongBoQuyenTep_(t, patch.cho_doi_tac_xem);
+  }
+
   ghiNhatKy_(ctx, 'SUA_TEP', 'HO_SO', h.ho_so_id,
     'Cập nhật tệp ' + t.ten_hien_thi, 'THANH_CONG', null, patch);
   return { da_luu: true };
@@ -257,6 +262,7 @@ function xoaTep_(payload, ctx) {
   let daBoVaoThungRac = false;
   if (t.nguon === 'DRIVE_HE_THONG' && t.drive_file_id) {
     try {
+      dongBoQuyenTep_(t, false);
       DriveApp.getFileById(t.drive_file_id).setTrashed(true);
       daBoVaoThungRac = true;
     } catch (e) {
@@ -342,6 +348,74 @@ function kiemTraLinkHangDem() {
   return kq;
 }
 
+/* ================= Quyền xem tệp trên Drive ================= */
+
+/**
+ * Đồng bộ quyền chia sẻ của một tệp trên Drive theo cờ "cho đối tác xem".
+ *
+ * Đối tác quét mã QR không đăng nhập Google, nên tệp để riêng tư sẽ hiện màn hình
+ * "Đăng nhập vào Tài khoản Google" thay vì nội dung. Bật cờ thì đặt tệp sang chế độ
+ * ai có link cũng xem được, đồng thời chặn tải xuống, in và sao chép — người xem
+ * chỉ đọc được qua trình xem nhúng.
+ *
+ * Tệp dạng link ngoài nằm ở tài khoản Drive khác nên hệ thống không đổi quyền được;
+ * quyền của chúng do bên kho video quyết định.
+ */
+function dongBoQuyenTep_(t, choXem) {
+  if (t.nguon !== 'DRIVE_HE_THONG' || !t.drive_file_id) return { doi: false };
+
+  try {
+    const f = DriveApp.getFileById(t.drive_file_id);
+    if (choXem) {
+      f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      chanTaiXuong_(t.drive_file_id, true);
+    } else {
+      f.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
+    }
+    return { doi: true };
+  } catch (e) {
+    console.error('Không đổi được quyền tệp ' + t.drive_file_id + ': ' + e.message);
+    return { doi: false, loi: e.message };
+  }
+}
+
+/**
+ * Bật hoặc tắt "người xem không được tải xuống, in và sao chép".
+ * DriveApp không có hàm cho việc này nên phải gọi thẳng Drive API.
+ */
+function chanTaiXuong_(driveFileId, chan) {
+  const res = UrlFetchApp.fetch(
+    'https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(driveFileId)
+    + '?supportsAllDrives=true',
+    {
+      method: 'patch',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+      payload: JSON.stringify({ copyRequiresWriterPermission: !!chan }),
+      muteHttpExceptions: true
+    }
+  );
+  if (res.getResponseCode() >= 300) {
+    console.error('Không đặt được cờ chặn tải xuống: ' + res.getContentText().slice(0, 200));
+  }
+}
+
+/**
+ * Rà lại toàn bộ tệp của hệ thống và đặt quyền cho khớp với cờ hiện tại.
+ * Dùng khi nghi ngờ quyền trên Drive bị lệch so với dữ liệu trong Sheet.
+ */
+function raSoatQuyenTep() {
+  let doi = 0, boQua = 0;
+  docAllRows_('TEP_DINH_KEM').forEach(function (t) {
+    if (t.nguon !== 'DRIVE_HE_THONG') { boQua++; return; }
+    const cho = t.cho_doi_tac_xem === true || String(t.cho_doi_tac_xem).toUpperCase() === 'TRUE';
+    if (dongBoQuyenTep_(t, cho).doi) doi++;
+  });
+  const tb = 'Đã đồng bộ quyền cho ' + doi + ' tệp, bỏ qua ' + boQua + ' tệp link ngoài.';
+  console.log(tb);
+  return tb;
+}
+
 /* ================= Tiện ích nội bộ ================= */
 
 function chuanBiTaiLen_(payload, ctx) {
@@ -399,6 +473,11 @@ function ghiSoTep_(t, ctx) {
     ngay_tao: nowIso_(),
     nguoi_tai: ctx.user_id
   });
+
+  // Đặt quyền trên Drive cho khớp với cờ, để đối tác xem được ngay.
+  if (t.cho_doi_tac_xem) {
+    dongBoQuyenTep_({ nguon: t.nguon, drive_file_id: t.drive_file_id }, true);
+  }
 
   ghiNhatKy_(ctx, 'THEM_TEP', 'HO_SO', t.ho_so.ho_so_id,
     'Thêm ' + (LOAI_TEP[t.loai] || {}).ten + ': ' + t.ten

@@ -281,7 +281,8 @@ async function dinhKemDaChuanBi(hoSoId) {
     thanh.dat(30);
     try {
       await api('themLinkTep', {
-        ho_so_id: hoSoId, link: l.link, loai: 'VIDEO', ten: l.ten
+        ho_so_id: hoSoId, link: l.link, loai: 'VIDEO', ten: l.ten,
+        cho_doi_tac_xem: true
       });
       thanh.xong();
     } catch (e) {
@@ -293,7 +294,7 @@ async function dinhKemDaChuanBi(hoSoId) {
   for (const t of cho_.tep) {
     const thanh = taoThanhTien(vung, t.name);
     try {
-      await taiMotTep(t, { loai: 'DOC', mo_ta: '', cho_doi_tac_xem: false }, thanh.dat, hoSoId);
+      await taiMotTep(t, { loai: 'DOC', mo_ta: '', cho_doi_tac_xem: true }, thanh.dat, hoSoId);
       thanh.xong();
     } catch (e) {
       thanh.loi(e.message);

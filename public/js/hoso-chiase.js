@@ -1,9 +1,9 @@
 /**
  * js/hoso-chiase.js — Cấp và theo dõi phiếu chia sẻ cho đối tác.
  *
- * Token và mã PIN chỉ hiện đúng một lần ngay sau khi cấp; hệ thống chỉ giữ
- * bản băm nên về sau không đọc lại được. Vì vậy màn hình cấp phiếu kèm luôn
- * mã QR và phiếu in để bàn giao ngay.
+ * Bảng dữ liệu chỉ giữ bản băm của token và PIN, nhưng bản gốc được cất riêng
+ * ở Script Properties, nên cán bộ mở lại phiếu để in hay gửi lại lúc nào cũng được.
+ * Thu hồi phiếu là xoá luôn bản gốc đó.
  */
 
 import { goiCanDangNhap as api, gioVn, ngayVn, chu, $ } from './api.js';
@@ -105,6 +105,12 @@ function veMotPhieu(p, d) {
   const nut = document.createElement('div');
   nut.className = 'hang-nut';
   nut.style.marginLeft = 'auto';
+  if (p.xem_lai_duoc) {
+    nut.append(nutNho('Xem phiếu', (b) => cho(b, async () => {
+      const r = await api('xemLaiPhieu', { share_id: p.share_id });
+      moPhieuVuaCap(r, true);
+    })));
+  }
   nut.append(nutNho('Lượt truy cập', () => moLuot(p)));
 
   if (d.duoc_thu_hoi && p.con_hieu_luc) {
@@ -239,8 +245,8 @@ function moHopThoaiCap() {
   }));
 }
 
-/** Màn hình bàn giao: mã QR, đường dẫn, PIN — tất cả chỉ hiện lần này. */
-function moPhieuVuaCap(r) {
+/** Màn hình bàn giao: mã QR, đường dẫn và mã PIN của phiếu. */
+function moPhieuVuaCap(r, xemLai) {
   const duongDan = `${location.origin}/xem?t=${r.token}`;
   let svg;
   try {
@@ -253,13 +259,14 @@ function moPhieuVuaCap(r) {
     <div class="hop-thoai" style="max-width:560px" role="dialog" aria-modal="true"
          aria-label="Phiếu chia sẻ vừa cấp">
       <div class="hop-thoai-dau">
-        <h2>Phiếu đã cấp cho ${thoat(r.ten_don_vi)}</h2>
+        <h2>${xemLai ? 'Phiếu của' : 'Phiếu đã cấp cho'} ${thoat(r.ten_don_vi)}</h2>
         <button class="nut-x" type="button" data-dong aria-label="Đóng">✕</button>
       </div>
       <div class="hop-thoai-than">
-        <div class="thong-bao canh-bao" style="margin-bottom:16px">
-          Đường dẫn và mã PIN chỉ hiện đúng lần này. Hệ thống chỉ lưu bản băm nên
-          về sau không xem lại được — hãy sao chép hoặc in ngay.
+        <div class="thong-bao ${xemLai ? 'tot' : 'canh-bao'}" style="margin-bottom:16px">
+          ${xemLai
+            ? 'Đây là đúng đường dẫn và mã đã cấp trước đây. Mở lại phiếu có ghi vào nhật ký hồ sơ.'
+            : 'Hãy sao chép hoặc in ngay để bàn giao. Sau này vẫn mở lại được bằng nút “Xem phiếu”.'}
         </div>
 
         <div id="vungQR" style="text-align:center;margin-bottom:16px">${svg}</div>

@@ -212,6 +212,7 @@ const ACTIONS = {
 
   capPhieuChiaSe: capPhieuChiaSe_,
   danhSachPhieu: danhSachPhieu_,
+  xemLaiPhieu: xemLaiPhieu_,
   thuHoiPhieu: thuHoiPhieu_,
 
   /* Bốn action công khai cho đối tác quét mã QR */

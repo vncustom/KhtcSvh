@@ -2,14 +2,49 @@
  * ChiaSe.gs — Phiếu chia sẻ hồ sơ cho đối tác.
  *
  * Thay cho mã PIN tĩnh in sẵn của bản demo. Mỗi lần cấp quyền tạo một phiếu riêng:
- * token ngẫu nhiên 128 bit (chỉ lưu hash), hạn hiệu lực, giới hạn lượt xem,
- * phạm vi tệp được xem, và thu hồi được bất cứ lúc nào.
+ * token ngẫu nhiên 128 bit, hạn hiệu lực, giới hạn lượt xem, phạm vi tệp được xem,
+ * và thu hồi được bất cứ lúc nào. Bảng trong Sheet chỉ giữ bản băm; bản gốc của
+ * token và PIN cất riêng ở Script Properties để cán bộ mở lại phiếu khi cần in.
  *
  * Mã in trên giấy chỉ còn là định danh hồ sơ, không còn là chìa khoá:
  * chìa khoá là mã xác thực gửi tới đối tác hoặc mã PIN cấp riêng cho từng phiếu.
  */
 
 const PHIEN_XEM_PHUT = 30;
+
+/**
+ * Token và mã PIN của phiếu được cất ở Script Properties chứ không ghi vào Sheet.
+ *
+ * Bảng PHIEU_CHIA_SE chỉ giữ bản băm, nên ai đọc được file Sheet cũng không suy ra
+ * được đường dẫn. Nhưng cán bộ phụ trách vẫn cần mở lại phiếu để in hoặc gửi lại,
+ * nên bản gốc được cất ở nơi chỉ Apps Script đọc được.
+ */
+function khoaBiMatPhieu_(shareId) {
+  return 'CS_BM_' + shareId;
+}
+
+function luuBiMatPhieu_(shareId, token, pin) {
+  try {
+    PROP.setProperty(khoaBiMatPhieu_(shareId), JSON.stringify({ t: token, p: pin || '' }));
+  } catch (e) {
+    console.error('Không lưu được bí mật phiếu: ' + e.message);
+  }
+}
+
+function docBiMatPhieu_(shareId) {
+  const s = PROP.getProperty(khoaBiMatPhieu_(shareId));
+  if (!s) return null;
+  try {
+    const o = JSON.parse(s);
+    return { token: o.t, pin: o.p || '' };
+  } catch (e) {
+    return null;
+  }
+}
+
+function xoaBiMatPhieu_(shareId) {
+  try { PROP.deleteProperty(khoaBiMatPhieu_(shareId)); } catch (e) { /* không có thì thôi */ }
+}
 
 /* ================= Cấp phiếu ================= */
 
@@ -77,10 +112,11 @@ function capPhieuChiaSe_(payload, ctx) {
     ngay_thu_hoi: ''
   });
 
+  luuBiMatPhieu_(shareId, token, pin);
+
   ghiNhatKy_(ctx, 'CAP_PHIEU_CHIA_SE', 'HO_SO', h.ho_so_id,
     'Cấp phiếu cho ' + dv.ten + ' (' + phuongThuc + '), hạn ' + soNgay + ' ngày', 'THANH_CONG');
 
-  // Token và PIN chỉ trả về đúng lần này; về sau hệ thống không đọc lại được.
   return {
     share_id: shareId,
     token: token,
@@ -138,6 +174,7 @@ function danhSachPhieu_(payload, ctx) {
         trang_thai: p.trang_thai,
         con_hieu_luc: p.trang_thai === 'HOAT_DONG' && !hetHan,
         nguoi_cap: tenNguoi[p.nguoi_cap] || p.nguoi_cap || '',
+        xem_lai_duoc: p.trang_thai === 'HOAT_DONG' && !hetHan && !!docBiMatPhieu_(p.share_id),
         ly_do_thu_hoi: p.ly_do_thu_hoi,
         lan_xem_cuoi: thanhCong.length
           ? thanhCong.map(function (x) { return x.thoi_gian; }).sort().pop()
@@ -150,6 +187,38 @@ function danhSachPhieu_(payload, ctx) {
           })
       };
     })
+  };
+}
+
+/**
+ * Mở lại một phiếu đã cấp để in hoặc gửi lại cho đối tác.
+ * Chỉ người có quyền cấp phiếu mới xem lại được, và mỗi lần xem đều ghi nhật ký.
+ */
+function xemLaiPhieu_(payload, ctx) {
+  doiHoiQuyen_(ctx, 'chia_se.cap');
+  const p = layPhieu_(payload.share_id);
+
+  const loi = kiemTraHieuLuc_(p);
+  if (loi) throw new Error(loi);
+
+  const bm = docBiMatPhieu_(p.share_id);
+  if (!bm) {
+    throw new Error('Không mở lại được phiếu này. Phiếu cấp trước khi hệ thống hỗ trợ '
+      + 'xem lại, hoặc bí mật đã bị dọn. Hãy thu hồi rồi cấp phiếu mới.');
+  }
+
+  const dv = timMot_('DON_VI', 'don_vi_id', p.don_vi_id);
+  ghiNhatKy_(ctx, 'XEM_LAI_PHIEU', 'HO_SO', p.ho_so_id,
+    'Mở lại phiếu của ' + (dv ? dv.ten : p.don_vi_id), 'THANH_CONG');
+
+  return {
+    share_id: p.share_id,
+    token: bm.token,
+    pin: bm.pin,
+    ten_don_vi: dv ? dv.ten : '',
+    email_nhan: p.email_nhan,
+    het_han: p.het_han,
+    phuong_thuc: p.phuong_thuc_xac_thuc
   };
 }
 
@@ -169,6 +238,8 @@ function thuHoiPhieu_(payload, ctx) {
   loc_('PHIEN', function (x) {
     return x.trang_thai === 'XEM_PHIEU' && String(x.user_id) === 'CS:' + p.share_id;
   }).forEach(function (x) { capNhat_('PHIEN', x.phien_id, { trang_thai: 'DA_HUY' }); });
+
+  xoaBiMatPhieu_(p.share_id);
 
   ghiNhatKy_(ctx, 'THU_HOI_PHIEU', 'HO_SO', p.ho_so_id,
     'Thu hồi phiếu ' + p.share_id + (payload.ly_do ? ' — ' + payload.ly_do : ''), 'THANH_CONG');

@@ -333,11 +333,30 @@ chưa thấy nội dung gì.
 | Gửi mã về email đối tác | Mặc định. Không có mã nào tồn tại sẵn để lộ — bản photo hợp đồng lọt ra ngoài cũng vô dụng. |
 | Cấp mã PIN riêng cho phiếu | Khi đối tác không có email ổn định. PIN sinh riêng từng phiếu, gửi qua kênh tách biệt với hợp đồng. |
 
-**Token và mã PIN chỉ hiện đúng một lần** ngay sau khi cấp, vì hệ thống chỉ giữ bản băm.
-Màn hình cấp phiếu kèm luôn mã QR, nút sao chép đường dẫn và nút in phiếu để bàn giao ngay.
+**Mở lại phiếu lúc nào cũng được** bằng nút *Xem phiếu*. Bảng dữ liệu chỉ giữ bản băm
+của token và PIN; bản gốc cất riêng ở **Script Properties** — nơi người đọc file Sheet
+không với tới. Thu hồi phiếu là xoá luôn bản gốc đó. Mỗi lần mở lại đều ghi vào nhật ký hồ sơ.
 
 **Đối tác chỉ thấy tệp đã đánh dấu** *Đối tác xem được* ở mục Tài liệu đính kèm.
+Ô này được **tích sẵn** khi tải tệp hoặc dán link, vì đó là trường hợp thường gặp.
 Tệp mở bằng trình xem nhúng của Drive, trang không in đường dẫn tệp gốc.
+
+### Quyền xem tệp trên Drive
+
+Đối tác quét mã QR không đăng nhập Google, nên tệp để riêng tư sẽ hiện màn hình
+*"Đăng nhập vào Tài khoản Google"* thay vì nội dung. Vì vậy khi bật ô *Đối tác xem được*,
+hệ thống tự đặt tệp trên Drive sang chế độ **ai có link cũng xem được**, đồng thời
+**chặn tải xuống, in và sao chép**. Tắt ô đó là tệp trở lại riêng tư ngay.
+
+Đây là đánh đổi cần biết rõ: trong lúc ô được bật, ai có đường dẫn Drive của tệp đều xem
+được mà không cần qua phiếu chia sẻ. Cách giảm thiểu: chỉ bật cho tệp thật sự cần gửi
+đối tác, và tắt đi khi xong việc.
+
+Tệp dạng link ngoài nằm ở tài khoản Drive khác nên hệ thống không đổi quyền được —
+quyền của chúng do bên kho video quyết định.
+
+Nếu nghi ngờ quyền trên Drive lệch so với dữ liệu trong Sheet, chạy hàm
+`raSoatQuyenTep()` trong trình soạn thảo Apps Script để đặt lại cho khớp.
 
 **Theo dõi và thu hồi.** Mỗi lần xác thực hay mở tệp đều ghi lại thời gian, địa chỉ IP
 và kết quả. Nhập sai 5 lần thì phiếu tự khoá 15 phút. Bấm Thu hồi là cắt luôn mọi phiên
