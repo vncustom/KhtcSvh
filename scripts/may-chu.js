@@ -94,7 +94,13 @@ const server = http.createServer((req, res) => {
 server.on('error', (e) => {
   if (e.code === 'EADDRINUSE') {
     console.error(`\n  Cổng ${CONG} đang bị chiếm bởi một tiến trình khác.`);
-    console.error('  Hãy đóng máy chủ cũ, hoặc chạy với cổng khác:  PORT=3001 npm run dev\n');
+    console.error('\n  Cách 1 — đóng tiến trình đang giữ cổng (chạy trong PowerShell):');
+    console.error(`    Get-NetTCPConnection -LocalPort ${CONG} -State Listen |`
+      + ' Select-Object -ExpandProperty OwningProcess -Unique |'
+      + ' ForEach-Object { Stop-Process -Id $_ -Force }');
+    console.error('\n  Cách 2 — chạy ở cổng khác:');
+    console.error('    set PORT=3001 && npm run dev        (Command Prompt)');
+    console.error('    $env:PORT=3001; npm run dev         (PowerShell)\n');
     process.exit(1);
   }
   throw e;
