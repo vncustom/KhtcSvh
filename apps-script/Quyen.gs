@@ -21,7 +21,8 @@ const BANG_QUYEN = {
   ADMIN: ['*'],
 
   KHTC: [
-    'ho_so.xem_tat_ca', 'ho_so.them', 'ho_so.sua_tat_ca', 'ho_so.xoa', 'ho_so.duyet',
+    'ho_so.xem_tat_ca', 'ho_so.them', 'ho_so.sua_tat_ca', 'ho_so.xoa',
+    'ho_so.gui_duyet', 'ho_so.duyet',
     'hop_dong.xem', 'hop_dong.sua',
     'tep.xem', 'tep.tai_len', 'tep.xoa',
     'chia_se.cap', 'chia_se.thu_hoi', 'chia_se.xem',

@@ -4,7 +4,7 @@ Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Ch
 
 Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ liệu trong Google Sheet · tài liệu trên Google Drive.
 
-**Trạng thái: Giai đoạn 1** — xác thực hai lớp và quản trị người dùng đã hoạt động. Nghiệp vụ hồ sơ chương trình sẽ có ở Giai đoạn 2.
+**Trạng thái: Giai đoạn 2** — hồ sơ chương trình và quy trình duyệt đã hoạt động. Hợp đồng, tệp đính kèm và phiếu chia sẻ sẽ có ở các giai đoạn sau.
 
 ---
 
@@ -12,14 +12,19 @@ Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ l
 
 ```
 public/            Giao diện — HTML, CSS, JS thuần, không có bước biên dịch
-  index.html         Đăng nhập: mật khẩu ➜ mã xác thực ➜ đổi mật khẩu lần đầu
-  app.html           Bảng điều khiển
-  quan-tri.html      Người dùng · Đơn vị · Cấu hình · Nhật ký
-  kiem-tra.html      Trang kiểm tra đường truyền của Giai đoạn 0
-  css/app.css        Bảng màu navy và các thành phần dùng chung
-  js/api.js          Lớp gọi API duy nhất
-  js/khung.js        Khung trang dùng chung: người đang đăng nhập, menu, đăng xuất
-  js/dangnhap.js     js/app.js     js/quantri.js     js/kiemtra.js
+  index.html          Đăng nhập: mật khẩu ➜ mã xác thực ➜ đổi mật khẩu lần đầu
+  app.html            Bảng điều khiển
+  ho-so.html          Danh sách hồ sơ: lọc, tìm kiếm, phân trang
+  ho-so-chi-tiet.html Xem một hồ sơ và thực hiện các bước duyệt
+  ho-so-sua.html      Biểu mẫu thêm và sửa hồ sơ
+  quan-tri.html       Người dùng · Đơn vị · Cấu hình · Nhật ký
+  kiem-tra.html       Trang kiểm tra đường truyền của Giai đoạn 0
+  css/app.css         Bảng màu navy và các thành phần dùng chung
+  js/api.js           Lớp gọi API duy nhất
+  js/khung.js         Khung trang dùng chung: người đang đăng nhập, menu, đăng xuất
+  js/hoso-chung.js    Hằng số và nhãn dùng chung cho ba trang hồ sơ
+  js/dangnhap.js      js/app.js            js/quantri.js       js/kiemtra.js
+  js/hoso-danhsach.js js/hoso-chitiet.js   js/hoso-sua.js
 
 api/               Tuyến trung gian chạy trên Vercel (Node)
   goi.js             Cửa chung cho mọi action nghiệp vụ
@@ -41,6 +46,8 @@ apps-script/       Mã chạy trên Google Apps Script
   Quyen.gs           Bảng phân quyền của năm vai trò
   NguoiDung.gs       Quản lý tài khoản và đơn vị
   CauHinh.gs         Cấu hình, thư mục Drive, nhật ký
+  Drive.gs           Cây thư mục lưu trữ của từng hồ sơ
+  HoSo.gs            Hồ sơ chương trình và quy trình duyệt
   Setup.gs           Khởi tạo bảng và dữ liệu mẫu
   Router.gs          Điểm vào doPost
 
@@ -57,7 +64,7 @@ scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
 
 1. Mở [script.google.com](https://script.google.com) **bằng tài khoản Google có gói 5 TB** (tài khoản này sẽ sở hữu toàn bộ tệp Drive và hạn mức email).
 2. Bấm **Dự án mới**. Đặt tên: `HTV KHTC API`.
-3. Tạo đủ 12 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
+3. Tạo đủ 14 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
    Trong trình soạn thảo, dấu `.gs` được thêm tự động — chỉ cần gõ tên `Schema`, `Config`, …
 4. Mở **Project Settings** ➜ tích **Show "appsscript.json" manifest file**, rồi dán nội dung
    `apps-script/appsscript.json` đè lên file manifest.
@@ -166,29 +173,42 @@ nhưng không bảo vệ được video.
 
 ---
 
-## Nâng cấp lên Giai đoạn 1
+## Nâng cấp lên Giai đoạn 2
 
-Nếu đã cài xong Giai đoạn 0 thì chỉ cần ba việc:
+1. **Thêm 2 file mới** vào dự án Apps Script: `Drive`, `HoSo`.
+   Dán đè `Quyen`, `Repo` và `Router` bằng bản mới.
+2. **Triển khai lại**: Deploy ➜ Manage deployments ➜ bấm bút chì ➜ Version: **New version** ➜ Deploy.
+   Bỏ qua bước này thì hệ thống báo *Không có action "danhSachHoSo"*.
+3. Vào mục **Quản trị ➜ Cấu hình**, kiểm tra đã có thư mục gốc trên Drive.
+   Thiếu thư mục thì không tạo được hồ sơ.
 
-1. **Thêm 5 file mới** vào dự án Apps Script: `Auth`, `Mail`, `Quyen`, `NguoiDung`, `CauHinh`.
-   Dán đè `Schema` và `Router` bằng bản mới.
-2. **Chạy lại `khoiTaoCoSoDuLieu`** để tạo tab `OTP`. Dữ liệu cũ giữ nguyên, không tạo trùng.
-3. **Triển khai lại**: Deploy ➜ Manage deployments ➜ bấm bút chì ➜ Version: **New version** ➜ Deploy.
-   Bỏ qua bước này thì Vercel vẫn gọi bản cũ và báo *Không có action "dangNhap"*.
+Lần này không cần chạy lại `khoiTaoCoSoDuLieu` vì cấu trúc bảng không đổi.
 
-Địa chỉ Web App không đổi, nên `.env.local` và biến môi trường trên Vercel giữ nguyên.
+---
 
-### Đăng nhập lần đầu
+## Quy trình duyệt hồ sơ
 
-Vào <http://localhost:3000>, đăng nhập bằng `admin` và mật khẩu in ra ở Bước 3.
-Mã xác thực 6 số sẽ được gửi tới `patusrila@gmail.com`, sau đó hệ thống bắt đổi mật khẩu.
+```
+NHAP  ──gửi duyệt──▶  CHO_DUYET  ──duyệt──▶  DA_DUYET  ──▶  LUU_TRU
+  ▲                       │                                     │
+  └──────trả lại──────────┘                └────mở lại──────────┘
+```
 
-Nếu hết hạn mức 100 email trong ngày, tạm đặt `bat_2fa` của tài khoản admin thành `FALSE`
-ngay trong tab `NGUOI_DUNG` để đăng nhập không cần mã.
+| Bước | Ai làm được |
+|---|---|
+| Gửi duyệt | Đơn vị chủ quản, Ban KH-TC, Quản trị |
+| Duyệt · Trả lại · Lưu trữ · Mở lại | Ban KH-TC, Quản trị |
+
+Trả lại bắt buộc nhập lý do; lý do được gửi email cho đơn vị chủ quản và ghi vào nhật ký hồ sơ.
+
+Đơn vị chủ quản sửa một hồ sơ **đã duyệt** thì hồ sơ tự quay về *Chờ duyệt* — biểu mẫu
+báo trước điều này. Ban KH-TC sửa thì không, vì họ duyệt được ngay.
+
+Đối tác chỉ thấy hồ sơ **đã duyệt** và có gán đơn vị của mình.
 
 ---
 
 ## Giai đoạn tiếp theo
 
-**Giai đoạn 2 — Hồ sơ chương trình.** Thêm, sửa, tìm kiếm, phân trang;
-quy trình Nháp ➜ Chờ duyệt ➜ Đã duyệt ➜ Lưu trữ; bảng điều khiển với số liệu thật.
+**Giai đoạn 3 — Tệp đính kèm.** Tải tài liệu, audio, ảnh vào Drive 5 TB;
+dán link video từ kho 20 TB và kiểm chứng link; xem trước PDF, phát video và audio.

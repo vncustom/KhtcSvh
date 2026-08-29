@@ -32,26 +32,50 @@
 
 <main class="khung">
 
-  <h1 style="margin:0 0 4px;font-size:22px;font-weight:600;color:var(--navy-800)">
-    Chào <span id="chaoTen">…</span>
-  </h1>
-  <p style="margin:0 0 26px;font-size:14px;color:var(--chu-nhat)">
-    Hệ thống đang ở Giai đoạn 1 — phần xác thực và quản trị người dùng đã hoạt động.
-    Phần hồ sơ chương trình sẽ có ở Giai đoạn 2.
-  </p>
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:22px">
+    <h1 style="margin:0;font-size:22px;font-weight:600;color:var(--navy-800)">
+      Chào <span id="chaoTen">…</span>
+    </h1>
+    <button class="nut nut-chinh an" id="nutTaoHoSo" type="button" style="margin-left:auto">
+      Tạo hồ sơ mới
+    </button>
+  </div>
 
-  <section class="luoi c4" id="oSoLieu" style="margin-bottom:24px"></section>
+  <section class="luoi c4" id="oSoLieu" style="margin-bottom:20px"></section>
 
-  <div class="luoi c2">
+  <div id="caiCanLam"></div>
+
+  <div class="luoi c2" style="align-items:start">
+
+    <section class="the">
+      <h2>Hồ sơ theo trạng thái</h2>
+      <p class="mo-ta">Bấm vào một dòng để mở danh sách đã lọc sẵn.</p>
+      <div id="theoTrangThai"></div>
+    </section>
+
+    <section class="the">
+      <h2>Hồ sơ theo đơn vị chủ quản</h2>
+      <p class="mo-ta">Sáu đơn vị có nhiều hồ sơ nhất.</p>
+      <div id="theoDonVi"></div>
+    </section>
+
+    <section class="the" style="grid-column:1/-1">
+      <h2>Hồ sơ cập nhật gần đây</h2>
+      <div class="bang-bao">
+        <table>
+          <thead>
+            <tr><th>Mã hồ sơ</th><th>Chương trình</th><th>Đơn vị chủ quản</th>
+                <th>Kênh</th><th>Trạng thái</th><th></th></tr>
+          </thead>
+          <tbody id="bangMoiNhat"></tbody>
+        </table>
+      </div>
+      <p id="chuaCoHoSo" class="trong an">Chưa có hồ sơ nào. Hãy tạo hồ sơ đầu tiên.</p>
+    </section>
 
     <section class="the">
       <h2>Tài khoản của bạn</h2>
-      <p class="mo-ta">Thông tin lấy trực tiếp từ phiên đăng nhập hiện tại.</p>
-      <div class="bang-bao">
-        <table>
-          <tbody id="bangToi"></tbody>
-        </table>
-      </div>
+      <div class="bang-bao"><table class="bang-truong"><tbody id="bangToi"></tbody></table></div>
     </section>
 
     <section class="the">
@@ -62,7 +86,6 @@
         <h2 style="font-size:14.5px">Thiết bị tin cậy</h2>
         <p class="mo-ta" style="margin-bottom:12px">
           Nếu bạn đã chọn ghi nhớ máy này, hệ thống sẽ không hỏi mã xác thực trong 30 ngày.
-          Bấm nút dưới đây để huỷ ghi nhớ trên mọi máy.
         </p>
         <button class="nut nut-phu" id="nutQuenThietBi" type="button">Quên mọi thiết bị</button>
       </div>

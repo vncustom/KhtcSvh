@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chi tiết hồ sơ — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <a href="/ho-so" style="font-size:13.5px;text-decoration:none">← Quay lại danh sách</a>
+
+  <div id="dangTai" class="trong">Đang tải hồ sơ…</div>
+
+  <div id="noiDung" class="an">
+
+    <div class="dau-ho-so">
+      <div style="min-width:0">
+        <div class="ma" id="maHoSo"></div>
+        <h1 id="tenChuongTrinh"></h1>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="trang-thai" id="chipTrangThai"></span>
+          <span id="donViChuQuan" style="font-size:13.5px;color:var(--chu-nhat)"></span>
+        </div>
+      </div>
+      <div class="hang-nut" id="hangHanhDong"></div>
+    </div>
+
+    <div id="canhTraLai" class="canh-tra-lai an">
+      <div class="tieu">Hồ sơ đã bị trả lại</div>
+      <div class="noi" id="lyDoTraLai"></div>
+    </div>
+
+    <div class="luoi c2" style="align-items:start">
+
+      <section class="the">
+        <h2>Tổng quan</h2>
+        <div class="bang-bao"><table class="bang-truong"><tbody id="bangTongQuan"></tbody></table></div>
+      </section>
+
+      <section class="the">
+        <h2>Sản xuất &amp; phát sóng</h2>
+        <div class="bang-bao"><table class="bang-truong"><tbody id="bangPhatSong"></tbody></table></div>
+      </section>
+
+      <section class="the" style="grid-column:1/-1">
+        <h2>Đối tác hợp tác</h2>
+        <div id="dsDoiTac"></div>
+      </section>
+
+      <section class="the" style="grid-column:1/-1">
+        <h2>Nội dung chương trình</h2>
+        <p id="moTa" style="margin:0;white-space:pre-wrap;font-size:14px"></p>
+      </section>
+
+      <section class="the" style="grid-column:1/-1">
+        <h2>Tài liệu đính kèm</h2>
+        <p class="mo-ta">
+          Phần quản lý tệp sẽ có ở Giai đoạn 3. Hiện tại thư mục đã được tạo sẵn trên Drive
+          và có thể mở trực tiếp.
+        </p>
+        <div id="oThuMuc"></div>
+      </section>
+
+      <section class="the" style="grid-column:1/-1">
+        <h2>Nhật ký hồ sơ</h2>
+        <p class="mo-ta">Mọi thay đổi trạng thái và chỉnh sửa đều được ghi lại.</p>
+        <div class="dong-thoi-gian" id="dongThoiGian"></div>
+      </section>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<div id="vungHopThoai"></div>
+
+<script type="module" src="/js/hoso-chitiet.js"></script>
+</body>
+</html>

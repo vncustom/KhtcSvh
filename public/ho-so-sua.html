@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biểu mẫu hồ sơ — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung" style="max-width:840px">
+
+  <a href="/ho-so" id="lienKetQuayLai" style="font-size:13.5px;text-decoration:none">← Quay lại danh sách</a>
+
+  <h1 id="tieuDe" style="margin:8px 0 4px;font-size:22px;font-weight:600;color:var(--navy-800)">
+    Tạo hồ sơ chương trình
+  </h1>
+  <p id="phuDe" style="margin:0 0 24px;font-size:14px;color:var(--chu-nhat)">
+    Hồ sơ mới được lưu ở trạng thái Nháp. Thư mục tài liệu trên Drive sẽ được tạo tự động.
+  </p>
+
+  <div id="dangTai" class="trong">Đang tải…</div>
+
+  <form id="bieuMau" class="an" novalidate>
+
+    <section class="the" style="margin-bottom:16px">
+      <h2>Thông tin chung</h2>
+
+      <div class="truong">
+        <label for="fTen">Tên chương trình *</label>
+        <input class="o-nhap" id="fTen" maxlength="200" required>
+      </div>
+
+      <div class="luoi c2">
+        <div class="truong">
+          <label for="fDonVi">Đơn vị chủ quản *</label>
+          <select class="o-nhap" id="fDonVi" required></select>
+        </div>
+        <div class="truong">
+          <label for="fTheLoai">Thể loại</label>
+          <select class="o-nhap" id="fTheLoai"><option value="">— Chưa xác định —</option></select>
+        </div>
+      </div>
+
+      <div class="truong">
+        <label for="fMoTa">Nội dung chương trình</label>
+        <textarea class="o-nhap" id="fMoTa" rows="4"
+                  placeholder="Mô tả ngắn về nội dung, quy mô, số tập, hình thức hợp tác…"></textarea>
+      </div>
+    </section>
+
+    <section class="the" style="margin-bottom:16px">
+      <h2>Sản xuất &amp; phát sóng</h2>
+
+      <div class="luoi c2">
+        <div class="truong">
+          <label for="fKenh">Kênh phát sóng</label>
+          <select class="o-nhap" id="fKenh"><option value="">— Chưa xác định —</option></select>
+        </div>
+        <div class="truong">
+          <label for="fThoiLuong">Thời lượng mỗi tập (phút) *</label>
+          <input class="o-nhap" id="fThoiLuong" type="number" min="1" max="600" required>
+        </div>
+        <div class="truong">
+          <label for="fSoTap">Số tập</label>
+          <input class="o-nhap" id="fSoTap" type="number" min="0" max="9999">
+        </div>
+        <div class="truong">
+          <label for="fNgayPhat">Ngày phát sóng</label>
+          <input class="o-nhap" id="fNgayPhat" type="date">
+        </div>
+        <div class="truong">
+          <label for="fGioPhat">Giờ phát sóng</label>
+          <input class="o-nhap" id="fGioPhat" placeholder="Ví dụ: 20:30">
+        </div>
+        <div class="truong">
+          <label for="fGhiChuLich">Ghi chú lịch phát</label>
+          <input class="o-nhap" id="fGhiChuLich" placeholder="Ví dụ: Thứ 7 hàng tuần">
+        </div>
+      </div>
+    </section>
+
+    <section class="the" style="margin-bottom:16px">
+      <h2>Đối tác hợp tác</h2>
+      <p class="mo-ta">
+        Đối tác được gán ở đây sẽ xem được hồ sơ sau khi hồ sơ được duyệt.
+      </p>
+      <div id="dsDoiTac"></div>
+      <button class="nut nut-phu" id="nutThemDoiTac" type="button" style="margin-top:8px">
+        + Thêm đối tác
+      </button>
+    </section>
+
+    <div id="canhBaoDuyet" class="thong-bao canh-bao an" style="margin-bottom:16px"></div>
+
+    <div class="hang-nut">
+      <button class="nut nut-chinh" type="submit" id="nutLuu">Lưu hồ sơ</button>
+      <a class="nut nut-phu" id="nutHuy" href="/ho-so" style="text-decoration:none">Huỷ</a>
+    </div>
+
+  </form>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<script type="module" src="/js/hoso-sua.js"></script>
+</body>
+</html>

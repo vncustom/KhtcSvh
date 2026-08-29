@@ -1,10 +1,10 @@
 /**
- * js/app.js — Bảng điều khiển. Giai đoạn 1 mới hiển thị thông tin phiên và quyền;
- * các ô số liệu về hồ sơ sẽ có nội dung thật ở Giai đoạn 2.
+ * js/app.js — Bảng điều khiển: số liệu hồ sơ, việc cần làm, hồ sơ gần đây.
  */
 
-import { goiCanDangNhap, soVn, gioVn, chu, $ } from './api.js';
-import { dungKhung, coQuyen, bao, cho, toi } from './khung.js';
+import { goiCanDangNhap as api, soVn, chu, $ } from './api.js';
+import { dungKhung, coQuyen, bao, cho } from './khung.js';
+import { LOP_TRANG_THAI, TEN_TRANG_THAI } from './hoso-chung.js';
 
 const NHAN_QUYEN = {
   '*': 'Toàn quyền',
@@ -43,13 +43,208 @@ const NHAN_QUYEN = {
   veBangToi(me);
   veQuyen(me);
 
-  if (coQuyen('cau_hinh.xem')) await veSoLieu();
+  try {
+    const d = await api('bangDieuKhien');
+    veSoLieu(d);
+    veCanLam(d);
+    veTheoTrangThai(d.theo_trang_thai);
+    veTheoDonVi(d.top_don_vi);
+    veMoiNhat(d.moi_nhat);
+    $('nutTaoHoSo').classList.toggle('an', !d.duoc_them);
+  } catch (e) {
+    bao(e.message, 'loi', 7);
+  }
+
+  if (coQuyen('cau_hinh.xem')) nhacCheDoKiemTra();
 })();
+
+/* ---------- Ô số liệu ---------- */
+
+function veSoLieu(d) {
+  const gio = Math.floor(d.tong_thoi_luong / 60);
+  const phut = d.tong_thoi_luong % 60;
+
+  const muc = [
+    { so: soVn(d.tong_ho_so), ten: 'Hồ sơ chương trình' },
+    { so: gio ? `${soVn(gio)}g ${phut}p` : `${phut} phút`, ten: 'Tổng thời lượng' },
+    { so: soVn(d.so_doi_tac), ten: 'Đối tác hợp tác' },
+    {
+      so: soVn(d.theo_trang_thai.CHO_DUYET),
+      ten: 'Đang chờ duyệt',
+      nhan: d.theo_trang_thai.CHO_DUYET > 0
+    }
+  ];
+
+  const vung = $('oSoLieu');
+  vung.replaceChildren();
+
+  for (const m of muc) {
+    const div = document.createElement('div');
+    div.className = 'o-so';
+    if (m.nhan) div.style.borderTopColor = 'var(--canh-bao)';
+
+    const s = document.createElement('div');
+    s.className = 'con-so';
+    if (m.nhan) s.style.color = 'var(--canh-bao)';
+    s.textContent = m.so;
+
+    const t = document.createElement('div');
+    t.className = 'ten';
+    t.textContent = m.ten;
+
+    div.append(s, t);
+    vung.append(div);
+  }
+}
+
+/* ---------- Việc cần làm ---------- */
+
+function veCanLam(d) {
+  const vung = $('caiCanLam');
+  vung.replaceChildren();
+
+  const soCho = d.theo_trang_thai.CHO_DUYET;
+  if (!soCho || !d.duoc_duyet) return;
+
+  const o = document.createElement('div');
+  o.className = 'thong-bao canh-bao';
+  o.style.marginBottom = '20px';
+
+  const chuNoi = document.createElement('span');
+  chuNoi.style.flex = '1';
+  chuNoi.textContent = soCho === 1
+    ? 'Có 1 hồ sơ đang chờ bạn duyệt.'
+    : `Có ${soVn(soCho)} hồ sơ đang chờ bạn duyệt.`;
+
+  const a = document.createElement('a');
+  a.className = 'nut-nho';
+  a.style.textDecoration = 'none';
+  a.href = '/ho-so?trang_thai=CHO_DUYET';
+  a.textContent = 'Xem ngay';
+
+  o.append(chuNoi, a);
+  vung.append(o);
+}
+
+/* ---------- Hai biểu đồ thanh ---------- */
+
+function veTheoTrangThai(theo) {
+  const vung = $('theoTrangThai');
+  vung.replaceChildren();
+
+  const tong = Object.values(theo).reduce((a, b) => a + b, 0) || 1;
+
+  for (const [ma, so] of Object.entries(theo)) {
+    const a = document.createElement('a');
+    a.className = 'thanh-do';
+    a.href = '/ho-so?trang_thai=' + ma;
+
+    const nhan = document.createElement('div');
+    nhan.className = 'thanh-nhan';
+    const ten = document.createElement('span');
+    ten.textContent = TEN_TRANG_THAI[ma] || ma;
+    const con = document.createElement('span');
+    con.className = 'thanh-so';
+    con.textContent = soVn(so);
+    nhan.append(ten, con);
+
+    const ray = document.createElement('div');
+    ray.className = 'thanh-ray';
+    const day = document.createElement('div');
+    day.className = 'thanh-day muc-' + LOP_TRANG_THAI[ma];
+    day.style.width = Math.round((so / tong) * 100) + '%';
+    ray.append(day);
+
+    a.append(nhan, ray);
+    vung.append(a);
+  }
+}
+
+function veTheoDonVi(ds) {
+  const vung = $('theoDonVi');
+  vung.replaceChildren();
+
+  if (!ds.length) {
+    const p = document.createElement('p');
+    p.className = 'mo-ta';
+    p.style.margin = '0';
+    p.textContent = 'Chưa có hồ sơ nào để thống kê.';
+    vung.append(p);
+    return;
+  }
+
+  const lonNhat = ds[0].so || 1;
+
+  for (const d of ds) {
+    const khoi = document.createElement('div');
+    khoi.className = 'thanh-do';
+
+    const nhan = document.createElement('div');
+    nhan.className = 'thanh-nhan';
+    const ten = document.createElement('span');
+    ten.textContent = d.ten;
+    const con = document.createElement('span');
+    con.className = 'thanh-so';
+    con.textContent = soVn(d.so);
+    nhan.append(ten, con);
+
+    const ray = document.createElement('div');
+    ray.className = 'thanh-ray';
+    const day = document.createElement('div');
+    day.className = 'thanh-day muc-navy';
+    day.style.width = Math.round((d.so / lonNhat) * 100) + '%';
+    ray.append(day);
+
+    khoi.append(nhan, ray);
+    vung.append(khoi);
+  }
+}
+
+/* ---------- Hồ sơ gần đây ---------- */
+
+function veMoiNhat(ds) {
+  const tbody = $('bangMoiNhat');
+  tbody.replaceChildren();
+  $('chuaCoHoSo').classList.toggle('an', ds.length > 0);
+
+  for (const h of ds) {
+    const ma = document.createElement('td');
+    ma.className = 'so';
+    const code = document.createElement('code');
+    code.textContent = h.ho_so_id;
+    ma.append(code);
+
+    const tt = document.createElement('td');
+    const chip = document.createElement('span');
+    chip.className = 'trang-thai ' + LOP_TRANG_THAI[h.trang_thai];
+    chip.textContent = h.ten_trang_thai;
+    tt.append(chip);
+
+    const xem = document.createElement('td');
+    const a = document.createElement('a');
+    a.className = 'nut-nho';
+    a.style.textDecoration = 'none';
+    a.href = '/ho-so-chi-tiet?id=' + encodeURIComponent(h.ho_so_id);
+    a.textContent = 'Xem';
+    xem.append(a);
+
+    const tr = document.createElement('tr');
+    tr.append(ma, o(h.ten_chuong_trinh), o(h.don_vi_chu_quan), o(h.kenh || '—'), tt, xem);
+    tbody.append(tr);
+  }
+}
+
+function o(chuNoi) {
+  const td = document.createElement('td');
+  td.textContent = chuNoi ?? '';
+  return td;
+}
+
+/* ---------- Tài khoản và quyền ---------- */
 
 function veBangToi(me) {
   const dong = [
     ['Tên đăng nhập', me.username],
-    ['Họ tên', me.ho_ten],
     ['Email nhận mã', me.email],
     ['Vai trò', me.ten_nhom],
     ['Đơn vị', me.ten_don_vi || '—']
@@ -60,13 +255,7 @@ function veBangToi(me) {
 
   for (const [nhan, giaTri] of dong) {
     const tr = document.createElement('tr');
-    const th = document.createElement('td');
-    th.style.cssText = 'width:40%;color:var(--chu-nhat)';
-    th.textContent = nhan;
-    const td = document.createElement('td');
-    td.style.fontWeight = '500';
-    td.textContent = giaTri;
-    tr.append(th, td);
+    tr.append(o(nhan), o(giaTri));
     tbody.append(tr);
   }
 }
@@ -85,52 +274,22 @@ function veQuyen(me) {
   }
 }
 
-async function veSoLieu() {
-  let d;
+async function nhacCheDoKiemTra() {
   try {
-    d = await goiCanDangNhap('tinhTrangHeThong');
-  } catch (e) {
-    bao(e.message, 'loi', 6);
-    return;
-  }
-
-  const o = [
-    { so: soVn(d.so_nguoi_dung), ten: 'Tài khoản' },
-    { so: soVn(d.so_don_vi), ten: 'Đơn vị & đối tác' },
-    { so: soVn(d.phien_dang_mo), ten: 'Phiên đang mở' },
-    {
-      so: soVn(d.email_con_lai),
-      ten: 'Email còn lại hôm nay',
-      canhBao: d.email_con_lai <= d.email_nguong_canh_bao
+    const t = await api('tinhTrangHeThong');
+    if (t.che_do_kiem_tra) {
+      bao('Chế độ kiểm tra đang bật — một số API gọi được mà không cần đăng nhập. '
+        + 'Hãy tắt trong mục Quản trị ➜ Cấu hình trước khi dùng thật.', 'canh-bao', 9);
     }
-  ];
-
-  const vung = $('oSoLieu');
-  vung.replaceChildren();
-
-  for (const m of o) {
-    const div = document.createElement('div');
-    div.className = 'o-so';
-    if (m.canhBao) div.style.borderTopColor = 'var(--canh-bao)';
-
-    const s = document.createElement('div');
-    s.className = 'con-so';
-    if (m.canhBao) s.style.color = 'var(--canh-bao)';
-    s.textContent = m.so;
-
-    const t = document.createElement('div');
-    t.className = 'ten';
-    t.textContent = m.ten;
-
-    div.append(s, t);
-    vung.append(div);
-  }
-
-  if (d.che_do_kiem_tra) {
-    bao('Chế độ kiểm tra đang bật — một số API gọi được mà không cần đăng nhập. '
-      + 'Hãy tắt trong mục Quản trị trước khi dùng thật.', 'canh-bao', 9);
-  }
+    if (t.email_con_lai <= t.email_nguong_canh_bao) {
+      bao(`Chỉ còn ${t.email_con_lai} lượt gửi email trong hôm nay.`, 'canh-bao', 8);
+    }
+  } catch { /* không có quyền thì thôi */ }
 }
+
+/* ---------- Nút ---------- */
+
+$('nutTaoHoSo').addEventListener('click', () => { location.href = '/ho-so-sua'; });
 
 $('nutQuenThietBi').addEventListener('click', (ev) => {
   cho(ev.currentTarget, async () => {

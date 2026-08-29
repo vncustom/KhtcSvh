@@ -122,6 +122,31 @@ function capNhat_(tab, giaTriKhoa, patch) {
   }
 }
 
+/**
+ * Xoá hẳn một dòng theo khoá chính.
+ * Chỉ dùng cho bảng liên kết như HO_SO_DON_VI, nơi giữ lại dòng cũ không có ý nghĩa.
+ * Với bảng nghiệp vụ, luôn dùng xoaMem_ để không mất dấu vết.
+ */
+function xoaDong_(tab, giaTriKhoa) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    const cot = cotCua_(tab);
+    const rows = docAllRows_(tab, true);
+    let dong = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (String(rows[i][cot[0]]) === String(giaTriKhoa)) { dong = rows[i]._dong; break; }
+    }
+    if (dong < 0) return false;
+    sheet_(tab).deleteRow(dong);
+    SpreadsheetApp.flush();
+    xoaCache_(tab);
+    return true;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 /** Xoá mềm: đổi trang_thai thành XOA thay vì xoá dòng, để giữ dấu vết. */
 function xoaMem_(tab, giaTriKhoa) {
   return capNhat_(tab, giaTriKhoa, { trang_thai: 'XOA', ngay_cap_nhat: nowIso_() });

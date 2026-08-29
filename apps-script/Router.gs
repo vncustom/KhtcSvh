@@ -169,7 +169,16 @@ const ACTIONS = {
   tinhTrangHeThong: tinhTrangHeThong_,
 
   layDanhMuc: layDanhMuc_,
-  xemNhatKy: xemNhatKy_
+  xemNhatKy: xemNhatKy_,
+
+  /* ----- Giai đoạn 2: hồ sơ chương trình ----- */
+
+  danhSachHoSo: danhSachHoSo_,
+  chiTietHoSo: chiTietHoSo_,
+  luuHoSo: luuHoSo_,
+  doiTrangThaiHoSo: doiTrangThaiHoSo_,
+  xoaHoSo: xoaHoSo_,
+  bangDieuKhien: bangDieuKhien_
 };
 
 /** Xác thực phiên đăng nhập từ token trong cookie. */

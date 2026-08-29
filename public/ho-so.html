@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hồ sơ chương trình — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+    <h1 style="margin:0;font-size:22px;font-weight:600;color:var(--navy-800)">Hồ sơ chương trình</h1>
+    <span id="tomTat" style="font-size:13.5px;color:var(--chu-nhat)"></span>
+    <button class="nut nut-chinh an" id="nutThem" type="button" style="margin-left:auto">
+      Tạo hồ sơ mới
+    </button>
+  </div>
+
+  <div class="loc-nhanh" id="locNhanh"></div>
+
+  <div class="the" style="margin-bottom:18px;padding:14px 16px">
+    <div class="luoi" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px">
+      <input class="o-nhap" id="fTuKhoa" type="search"
+             placeholder="Tìm tên chương trình, mã hồ sơ, đối tác…">
+      <select class="o-nhap" id="fDonVi"><option value="">Mọi đơn vị</option></select>
+      <select class="o-nhap" id="fKenh"><option value="">Mọi kênh</option></select>
+      <select class="o-nhap" id="fTheLoai"><option value="">Mọi thể loại</option></select>
+      <select class="o-nhap" id="fSapXep">
+        <option value="moi_nhat">Mới cập nhật trước</option>
+        <option value="phat_song">Ngày phát sóng gần nhất</option>
+        <option value="ten">Theo tên chương trình</option>
+      </select>
+      <button class="nut nut-phu" id="nutXoaLoc" type="button">Bỏ lọc</button>
+    </div>
+  </div>
+
+  <div class="bang-bao">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã hồ sơ</th><th>Chương trình</th><th>Đơn vị chủ quản</th>
+          <th>Kênh</th><th>Thời lượng</th><th>Phát sóng</th><th>Trạng thái</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="bangHoSo"></tbody>
+    </table>
+  </div>
+
+  <p id="khongCo" class="trong an">Chưa có hồ sơ nào khớp với bộ lọc hiện tại.</p>
+
+  <div class="hang-nut" style="margin-top:16px;justify-content:center;align-items:center">
+    <button class="nut nut-phu" id="nutTruoc" type="button">← Trước</button>
+    <span id="soTrang" style="font-size:13px;color:var(--chu-nhat);padding:0 12px"></span>
+    <button class="nut nut-phu" id="nutSau" type="button">Sau →</button>
+  </div>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<script type="module" src="/js/hoso-danhsach.js"></script>
+</body>
+</html>

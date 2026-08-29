@@ -23,17 +23,21 @@ const THEO_DOI = [path.join(GOC, 'api'), path.join(GOC, 'scripts')];
 let con = null;
 let hen = null;
 let dangDong = false;
+let dangKhoiDongLai = false;
 
 function chay() {
   con = spawn(process.execPath, [MAY_CHU], { stdio: 'inherit', env: process.env });
 
-  con.on('exit', (ma) => {
-    if (dangDong) return;
-    // Cổng bị chiếm hoặc lỗi cú pháp: dừng hẳn thay vì lặp vô hạn.
-    if (ma !== null && ma !== 0) {
-      console.error(`\n  Máy chủ dừng với mã ${ma}. Sửa lỗi rồi chạy lại "npm run dev".\n`);
-      process.exit(ma);
-    }
+  con.on('exit', (ma, tinHieu) => {
+    // Khởi động lại do sửa mã thì đã đặt cờ, bỏ qua.
+    if (dangKhoiDongLai || dangDong) return;
+
+    // Mọi trường hợp còn lại đều bất thường: cổng bị chiếm, lỗi cú pháp, hoặc
+    // có ai đó kết thúc tiến trình. Dừng hẳn thay vì âm thầm hồi sinh máy chủ.
+    console.error(tinHieu
+      ? `\n  Máy chủ bị kết thúc bởi ${tinHieu}. Chạy lại "npm run dev" khi cần.\n`
+      : `\n  Máy chủ dừng với mã ${ma}. Sửa lỗi rồi chạy lại "npm run dev".\n`);
+    process.exit(ma || 1);
   });
 }
 
@@ -42,8 +46,9 @@ function khoiDongLai(tep) {
   // Trình soạn thảo thường ghi file nhiều lần liên tiếp, nên đợi một nhịp.
   hen = setTimeout(() => {
     console.log(`\n  ↻ ${tep} đã đổi — khởi động lại máy chủ…`);
+    dangKhoiDongLai = true;
     if (con) con.kill('SIGTERM');
-    setTimeout(chay, 120);
+    setTimeout(() => { dangKhoiDongLai = false; chay(); }, 120);
   }, 150);
 }
 

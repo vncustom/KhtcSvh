@@ -8,6 +8,7 @@ import { goi, dat, chu, $ } from './api.js';
 /** Trang nào cần quyền nào mới hiện trong thanh điều hướng. */
 const MENU = [
   { duong_dan: '/app', ten: 'Bảng điều khiển', quyen: null },
+  { duong_dan: '/ho-so', ten: 'Hồ sơ chương trình', quyen: null },
   { duong_dan: '/quan-tri', ten: 'Quản trị', quyen: 'nhat_ky.xem' }
 ];
 
