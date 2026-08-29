@@ -73,6 +73,7 @@ function khoiTaoCoSoDuLieu() {
   const bienBan = [];
 
   bienBan.push(taoCacTab_(ss));
+  bienBan.push(dongBoCotBang());
   bienBan.push(napCauHinh_());
   bienBan.push(napDanhMuc_());
   bienBan.push(napDonVi_());
@@ -169,7 +170,11 @@ function napDonVi_() {
 
 function napNguoiDung_() {
   const daCo = {};
-  docAllRows_('NGUOI_DUNG', true).forEach(function (r) { daCo[r.username] = true; });
+  const daCoDonVi = {};
+  docAllRows_('NGUOI_DUNG', true).forEach(function (r) {
+    daCo[r.username] = true;
+    if (r.don_vi_id) daCoDonVi[r.don_vi_id] = true;
+  });
 
   const donVi = docAllRows_('DON_VI', true);
   const timDonVi = function (ten) {
@@ -185,7 +190,10 @@ function napNguoiDung_() {
 
   const them = [];
   const taoUser = function (username, hoTen, nhom, donViId, matKhau) {
+    // Bỏ qua nếu đã có tài khoản cùng tên đăng nhập, hoặc đã có tài khoản
+    // cho đúng đơn vị đó — tránh tạo trùng khi cách sinh tên đăng nhập thay đổi.
     if (daCo[username]) return;
+    if (donViId && daCoDonVi[donViId]) return;
     const mk = taoMatKhau_(matKhau);
     them.push({
       user_id: 'U_' + username, username: username, ho_ten: hoTen,

@@ -62,6 +62,15 @@
           <label for="fTheLoai">Thể loại</label>
           <select class="o-nhap" id="fTheLoai"><option value="">— Chưa xác định —</option></select>
         </div>
+        <div class="truong">
+          <label for="fMaDonVi">Mã chương trình của đơn vị</label>
+          <input class="o-nhap" id="fMaDonVi" placeholder="Ví dụ: 459537">
+          <p class="goi-y">Mã nội bộ trên phiếu của đơn vị, để đối chiếu về sau.</p>
+        </div>
+        <div class="truong">
+          <label for="fTenFile">Tên file</label>
+          <input class="o-nhap" id="fTenFile" placeholder="Tên file video trên hệ thống lưu trữ">
+        </div>
       </div>
 
       <div class="truong">
@@ -80,12 +89,10 @@
           <select class="o-nhap" id="fKenh"><option value="">— Chưa xác định —</option></select>
         </div>
         <div class="truong">
-          <label for="fThoiLuong">Thời lượng mỗi tập (phút) *</label>
-          <input class="o-nhap" id="fThoiLuong" type="number" min="1" max="600" required>
-        </div>
-        <div class="truong">
-          <label for="fSoTap">Số tập</label>
-          <input class="o-nhap" id="fSoTap" type="number" min="0" max="9999">
+          <label for="fThoiLuong">Thời lượng chương trình *</label>
+          <input class="o-nhap" id="fThoiLuong" placeholder="mm:ss — ví dụ 13:44"
+                 inputmode="numeric" required>
+          <p class="goi-y" id="goiYThoiLuong">Nhập theo dạng phút:giây, ví dụ <code>13:44</code>.</p>
         </div>
         <div class="truong">
           <label for="fNgayPhat">Ngày phát sóng</label>
@@ -111,6 +118,33 @@
       <button class="nut nut-phu" id="nutThemDoiTac" type="button" style="margin-top:8px">
         + Thêm đối tác
       </button>
+    </section>
+
+    <section class="the" id="khoiTep" style="margin-bottom:16px">
+      <h2>Tài liệu &amp; video</h2>
+      <p class="mo-ta" id="moTaTep">
+        Chọn sẵn tệp và dán link ngay tại đây. Sau khi bấm lưu, hệ thống tạo hồ sơ
+        rồi tự đính kèm những gì bạn đã chuẩn bị.
+      </p>
+
+      <div class="luoi c2" style="align-items:end">
+        <div class="truong" style="margin:0">
+          <label for="fLinkVideo">Link video</label>
+          <input class="o-nhap" id="fLinkVideo" placeholder="https://drive.google.com/file/d/…/view">
+        </div>
+        <div class="truong" style="margin:0">
+          <label for="fTenVideo">Tên hiển thị của video</label>
+          <input class="o-nhap" id="fTenVideo" placeholder="Để trống sẽ lấy theo Tên file ở trên">
+        </div>
+      </div>
+
+      <div class="hang-nut" style="margin-top:12px">
+        <button class="nut nut-phu" id="nutThemLink" type="button">+ Thêm link vào danh sách</button>
+        <button class="nut nut-phu" id="nutChonTep" type="button">+ Chọn tệp tài liệu</button>
+      </div>
+
+      <div id="dsCho" style="margin-top:14px"></div>
+      <div id="tienTrinhTep" style="margin-top:14px"></div>
     </section>
 
     <div id="canhBaoDuyet" class="thong-bao canh-bao an" style="margin-bottom:16px"></div>

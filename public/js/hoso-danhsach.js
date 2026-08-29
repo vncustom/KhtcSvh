@@ -4,7 +4,7 @@
 
 import { goiCanDangNhap as api, soVn, ngayVn, chu, $ } from './api.js';
 import { dungKhung, coQuyen, bao } from './khung.js';
-import { LOP_TRANG_THAI, TEN_TRANG_THAI } from './hoso-chung.js';
+import { LOP_TRANG_THAI, TEN_TRANG_THAI, giaySangChu, tongThoiLuong } from './hoso-chung.js';
 
 const loc = { trang: 1, moi_trang: 20, sap_xep: 'moi_nhat', trang_thai: '' };
 let danhMuc = {};
@@ -15,7 +15,9 @@ let danhMuc = {};
   const me = await dungKhung({ trangHienTai: '/ho-so' });
   if (!me) return;
 
-  $('nutThem').classList.toggle('an', !coQuyen('ho_so.them'));
+  const duocThem = coQuyen('ho_so.them');
+  $('nutThem').classList.toggle('an', !duocThem);
+  $('nutNhapExcel').classList.toggle('an', !duocThem);
 
   // Cho phép mở sẵn một bộ lọc từ địa chỉ, ví dụ /ho-so?trang_thai=CHO_DUYET
   const tham = new URLSearchParams(location.search);
@@ -66,7 +68,7 @@ async function nap() {
   veLocNhanh(d.thong_ke);
   veBang(d.dong);
 
-  chu($('tomTat'), `${soVn(d.tong)} hồ sơ · ${soVn(d.thong_ke.tong_thoi_luong)} phút`);
+  chu($('tomTat'), `${soVn(d.tong)} hồ sơ · ${tongThoiLuong(d.thong_ke.tong_thoi_luong)}`);
   chu($('soTrang'), `Trang ${d.trang} / ${d.so_trang}`);
   $('nutTruoc').disabled = d.trang <= 1;
   $('nutSau').disabled = d.trang >= d.so_trang;
@@ -123,6 +125,12 @@ function veBang(dong) {
     t1.style.fontWeight = '500';
     t1.textContent = h.ten_chuong_trinh;
     ten.append(t1);
+    if (h.ten_file) {
+      const tf = document.createElement('div');
+      tf.style.cssText = 'font-size:12.5px;color:var(--chu-mo)';
+      tf.textContent = 'File: ' + h.ten_file;
+      ten.append(tf);
+    }
     if (h.doi_tac.length) {
       const t2 = document.createElement('div');
       t2.style.cssText = 'font-size:12.5px;color:var(--chu-mo)';
@@ -162,7 +170,7 @@ function veBang(dong) {
       ma, ten,
       o(h.don_vi_chu_quan),
       o(h.kenh || '—'),
-      o(h.thoi_luong_phut ? h.thoi_luong_phut + ' phút' : '—', 'so'),
+      o(h.thoi_luong_giay ? giaySangChu(h.thoi_luong_giay) : '—', 'so'),
       phatSong, tt, xem
     );
     tbody.append(tr);
@@ -202,3 +210,4 @@ $('nutXoaLoc').addEventListener('click', () => {
 $('nutTruoc').addEventListener('click', () => { loc.trang--; nap(); });
 $('nutSau').addEventListener('click', () => { loc.trang++; nap(); });
 $('nutThem').addEventListener('click', () => { location.href = '/ho-so-sua'; });
+$('nutNhapExcel').addEventListener('click', () => { location.href = '/nhap-excel'; });

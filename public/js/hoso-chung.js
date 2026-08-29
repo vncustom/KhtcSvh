@@ -34,6 +34,42 @@ export const VAI_TRO_DOI_TAC = {
   DICH_VU: 'Dịch vụ kỹ thuật'
 };
 
+/**
+ * Thời lượng lưu bằng giây, hiển thị và nhập theo dạng mm:ss.
+ * Quá 60 phút thì hiện thêm phần giờ cho dễ đọc.
+ */
+export function giaySangChu(giay) {
+  const n = Math.max(0, Math.round(Number(giay) || 0));
+  const gio = Math.floor(n / 3600);
+  const phut = Math.floor((n % 3600) / 60);
+  const giaySo = n % 60;
+  const hai = (x) => String(x).padStart(2, '0');
+  return gio ? `${gio}:${hai(phut)}:${hai(giaySo)}` : `${phut}:${hai(giaySo)}`;
+}
+
+/** Đọc chuỗi mm:ss hoặc h:mm:ss thành số giây. Trả về null nếu không hợp lệ. */
+export function chuSangGiay(chuoi) {
+  const s = String(chuoi || '').trim();
+  if (!s) return null;
+
+  const phan = s.split(':').map((x) => x.trim());
+  if (phan.some((x) => x === '' || !/^\d+$/.test(x))) return null;
+
+  const so = phan.map(Number);
+  if (so.length === 3) return so[0] * 3600 + so[1] * 60 + so[2];
+  if (so.length === 2) return so[0] * 60 + so[1];
+  if (so.length === 1) return so[0] * 60;   // chỉ một số thì hiểu là phút
+  return null;
+}
+
+/** Tổng thời lượng của nhiều hồ sơ, hiển thị theo giờ và phút. */
+export function tongThoiLuong(giay) {
+  const n = Math.max(0, Math.round(Number(giay) || 0));
+  const gio = Math.floor(n / 3600);
+  const phut = Math.round((n % 3600) / 60);
+  return gio ? `${gio} giờ ${phut} phút` : `${phut} phút`;
+}
+
 /** Đọc mã hồ sơ từ địa chỉ trang. */
 export function maHoSoTuUrl() {
   return new URLSearchParams(location.search).get('id') || '';

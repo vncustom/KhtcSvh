@@ -14,14 +14,66 @@ const TRANG_THAI_HO_SO = {
   XOA: 'Đã xoá'
 };
 
-/** Ai làm được hành động nào, và hành động đó đi từ trạng thái nào sang trạng thái nào. */
+/** Hành động nào đi từ trạng thái nào sang trạng thái nào. */
 const CHUYEN_TRANG_THAI = {
-  GUI_DUYET: { tu: ['NHAP'], sang: 'CHO_DUYET', quyen: 'ho_so.gui_duyet', canLyDo: false },
-  DUYET: { tu: ['CHO_DUYET'], sang: 'DA_DUYET', quyen: 'ho_so.duyet', canLyDo: false },
-  TRA_LAI: { tu: ['CHO_DUYET'], sang: 'NHAP', quyen: 'ho_so.duyet', canLyDo: true },
-  LUU_TRU: { tu: ['DA_DUYET'], sang: 'LUU_TRU', quyen: 'ho_so.duyet', canLyDo: false },
-  MO_LAI: { tu: ['LUU_TRU'], sang: 'DA_DUYET', quyen: 'ho_so.duyet', canLyDo: false }
+  GUI_DUYET: { tu: ['NHAP'], sang: 'CHO_DUYET', vai: 'GUI', canLyDo: false },
+  DUYET: { tu: ['CHO_DUYET'], sang: 'DA_DUYET', vai: 'DUYET', canLyDo: false },
+  TRA_LAI: { tu: ['CHO_DUYET'], sang: 'NHAP', vai: 'DUYET', canLyDo: true },
+  LUU_TRU: { tu: ['DA_DUYET'], sang: 'LUU_TRU', vai: 'DUYET', canLyDo: false },
+  MO_LAI: { tu: ['LUU_TRU'], sang: 'DA_DUYET', vai: 'DUYET', canLyDo: false }
 };
+
+/**
+ * Ai được gửi duyệt hồ sơ này.
+ *
+ * Ngoài đơn vị chủ quản, một số đơn vị được gửi duyệt hộ cho đơn vị khác —
+ * danh sách nằm ở tham số DON_VI_GUI_DUYET_HO trong mục Quản trị ➜ Cấu hình.
+ */
+function duocGuiDuyet_(h, ctx) {
+  if (!co_(ctx, 'ho_so.gui_duyet')) return false;
+  if (co_(ctx, 'ho_so.sua_tat_ca')) return true;
+  if (String(h.don_vi_chu_quan_id) === String(ctx.don_vi_id)) return true;
+  return laDonViGuiDuyetHo_(ctx.don_vi_id);
+}
+
+function laDonViGuiDuyetHo_(donViId) {
+  if (!donViId) return false;
+  const ten = getCauHinh('DON_VI_GUI_DUYET_HO', '');
+  if (!ten) return false;
+
+  // Tham số ghi theo tên đơn vị cho dễ đọc, nên phải đổi sang mã để so sánh.
+  const maCho = ten.split(';')
+    .map(function (t) { return khongDau_(t.trim()); })
+    .filter(Boolean);
+
+  const dv = timMot_('DON_VI', 'don_vi_id', donViId);
+  return !!(dv && maCho.indexOf(khongDau_(dv.ten)) >= 0);
+}
+
+/**
+ * Ai được duyệt, trả lại, lưu trữ hoặc mở lại hồ sơ này.
+ * Ban KH-TC và quản trị luôn được; đơn vị chủ quản được duyệt hồ sơ của chính mình
+ * khi tham số DON_VI_CHU_QUAN_DUOC_DUYET đang bật.
+ */
+function duocDuyet_(h, ctx) {
+  if (co_(ctx, 'ho_so.duyet')) return true;
+  if (getCauHinh('DON_VI_CHU_QUAN_DUOC_DUYET', 'TAT') !== 'BAT') return false;
+  if (!co_(ctx, 'ho_so.sua_don_vi')) return false;
+  return String(h.don_vi_chu_quan_id) === String(ctx.don_vi_id);
+}
+
+function coTheChuyen_(h, ctx, hanhDong) {
+  const buoc = CHUYEN_TRANG_THAI[hanhDong];
+  if (!buoc || buoc.tu.indexOf(h.trang_thai) < 0) return false;
+  return buoc.vai === 'GUI' ? duocGuiDuyet_(h, ctx) : duocDuyet_(h, ctx);
+}
+
+/** Thời lượng tính bằng giây; dữ liệu cũ lưu theo phút nên quy đổi lại. */
+function giayCua_(h) {
+  const giay = Number(h.thoi_luong_giay || 0);
+  if (giay > 0) return giay;
+  return Number(h.thoi_luong_phut || 0) * 60;
+}
 
 /* ================= Danh sách ================= */
 
@@ -107,7 +159,7 @@ function danhSachHoSo_(payload, ctx) {
   Object.keys(TRANG_THAI_HO_SO).forEach(function (t) { thongKe[t] = 0; });
   ds.forEach(function (h) {
     thongKe[h.trang_thai] = (thongKe[h.trang_thai] || 0) + 1;
-    thongKe.tong_thoi_luong += Number(h.thoi_luong_phut || 0);
+    thongKe.tong_thoi_luong += giayCua_(h);
   });
 
   const trang = Math.max(1, Number(f.trang || 1));
@@ -129,8 +181,9 @@ function danhSachHoSo_(payload, ctx) {
           .filter(Boolean),
         the_loai: h.the_loai,
         kenh: h.kenh,
-        thoi_luong_phut: Number(h.thoi_luong_phut || 0),
-        so_tap: h.so_tap,
+        thoi_luong_giay: giayCua_(h),
+        ma_don_vi: h.ma_don_vi,
+        ten_file: h.ten_file,
         ngay_phat_song: h.ngay_phat_song,
         gio_phat_song: h.gio_phat_song,
         trang_thai: h.trang_thai,
@@ -172,8 +225,9 @@ function chiTietHoSo_(payload, ctx) {
       don_vi_chu_quan: tenDonVi[h.don_vi_chu_quan_id] || '',
       the_loai: h.the_loai,
       kenh: h.kenh,
-      thoi_luong_phut: Number(h.thoi_luong_phut || 0),
-      so_tap: h.so_tap,
+      thoi_luong_giay: giayCua_(h),
+      ma_don_vi: h.ma_don_vi,
+      ten_file: h.ten_file,
       ngay_phat_song: h.ngay_phat_song,
       gio_phat_song: h.gio_phat_song,
       ghi_chu_lich: h.ghi_chu_lich,
@@ -215,16 +269,17 @@ function luuHoSo_(payload, ctx) {
     throw new Error('Đơn vị chủ quản không tồn tại.');
   }
 
-  const thoiLuong = Number(payload.thoi_luong_phut || 0);
-  if (!(thoiLuong > 0)) throw new Error('Thời lượng phải lớn hơn 0 phút.');
+  const giay = Number(payload.thoi_luong_giay || 0);
+  if (!(giay > 0)) throw new Error('Thời lượng chương trình phải lớn hơn 0.');
 
   const truong = {
     ten_chuong_trinh: ten,
     don_vi_chu_quan_id: donViChuQuan,
     the_loai: String(payload.the_loai || ''),
     kenh: String(payload.kenh || ''),
-    thoi_luong_phut: thoiLuong,
-    so_tap: Number(payload.so_tap || 0),
+    thoi_luong_giay: giay,
+    ma_don_vi: String(payload.ma_don_vi || ''),
+    ten_file: String(payload.ten_file || ''),
     ngay_phat_song: String(payload.ngay_phat_song || ''),
     gio_phat_song: String(payload.gio_phat_song || ''),
     ghi_chu_lich: String(payload.ghi_chu_lich || ''),
@@ -255,8 +310,8 @@ function luuHoSo_(payload, ctx) {
 
     ghiNhatKy_(ctx, 'SUA_HO_SO', 'HO_SO', cu.ho_so_id,
       'Cập nhật hồ sơ ' + ten, 'THANH_CONG',
-      { ten: cu.ten_chuong_trinh, kenh: cu.kenh, thoi_luong: cu.thoi_luong_phut },
-      { ten: ten, kenh: truong.kenh, thoi_luong: thoiLuong });
+      { ten: cu.ten_chuong_trinh, kenh: cu.kenh, thoi_luong: giayCua_(cu) },
+      { ten: ten, kenh: truong.kenh, thoi_luong: giay });
 
     if (truong.trang_thai === 'CHO_DUYET') {
       ghiNhatKy_(ctx, 'CHO_DUYET_LAI', 'HO_SO', cu.ho_so_id,
@@ -283,13 +338,9 @@ function luuHoSo_(payload, ctx) {
   truong.ngay_tao = nowIso_();
   truong.nguoi_tao = ctx.user_id;
 
-  // Tạo thư mục Drive trước khi ghi dòng, để hồ sơ không bao giờ thiếu chỗ lưu tài liệu.
-  const nam = (truong.ngay_phat_song || nowIso_()).slice(0, 4);
-  try {
-    truong.drive_folder_id = taoThuMucHoSo_(hoSoId, nam);
-  } catch (e) {
-    throw new Error('Không tạo được thư mục lưu trữ: ' + e.message);
-  }
+  // Thư mục Drive chỉ được tạo khi có tệp đầu tiên. Tạo sẵn cho mọi hồ sơ
+  // sẽ làm việc nhập hàng loạt chậm hẳn, mà phần lớn hồ sơ chưa có tệp ngay.
+  truong.drive_folder_id = '';
 
   them_('HO_SO', truong);
   luuDoiTac_(hoSoId, payload.doi_tac, ctx);
@@ -336,17 +387,18 @@ function doiTrangThaiHoSo_(payload, ctx) {
   const buoc = CHUYEN_TRANG_THAI[hanhDong];
 
   if (!buoc) throw new Error('Hành động không hợp lệ.');
-  doiHoiQuyen_(ctx, buoc.quyen);
 
   if (buoc.tu.indexOf(h.trang_thai) < 0) {
     throw new Error('Hồ sơ đang ở trạng thái "' + (TRANG_THAI_HO_SO[h.trang_thai] || h.trang_thai)
       + '" nên không thực hiện được thao tác này.');
   }
 
-  // Người gửi duyệt phải thuộc đơn vị chủ quản, trừ khi có quyền sửa mọi hồ sơ.
-  if (hanhDong === 'GUI_DUYET' && !co_(ctx, 'ho_so.sua_tat_ca')
-      && String(h.don_vi_chu_quan_id) !== String(ctx.don_vi_id)) {
-    throw new Error('Bạn chỉ gửi duyệt được hồ sơ của đơn vị mình.');
+  if (!coTheChuyen_(h, ctx, hanhDong)) {
+    ghiNhatKy_(ctx, 'TU_CHOI_QUYEN', 'HO_SO', h.ho_so_id,
+      'Không đủ quyền cho thao tác ' + hanhDong, 'THAT_BAI');
+    throw new Error(buoc.vai === 'GUI'
+      ? 'Bạn chỉ gửi duyệt được hồ sơ của đơn vị mình, hoặc của đơn vị mà bạn được gửi duyệt hộ.'
+      : 'Tài khoản của bạn không có quyền duyệt hồ sơ này.');
   }
 
   const lyDo = String(payload.ly_do || '').trim();
@@ -447,7 +499,7 @@ function bangDieuKhien_(payload, ctx) {
 
   return {
     tong_ho_so: tk.tong,
-    tong_thoi_luong: tk.tong_thoi_luong,
+    tong_thoi_luong_giay: tk.tong_thoi_luong,
     theo_trang_thai: {
       NHAP: tk.NHAP || 0,
       CHO_DUYET: tk.CHO_DUYET || 0,
@@ -528,8 +580,7 @@ function duocLam_(h, ctx) {
   }
 
   Object.keys(CHUYEN_TRANG_THAI).forEach(function (hd) {
-    const b = CHUYEN_TRANG_THAI[hd];
-    duoc[hd] = co_(ctx, b.quyen) && b.tu.indexOf(h.trang_thai) >= 0;
+    duoc[hd] = coTheChuyen_(h, ctx, hd);
   });
 
   duoc.xoa = co_(ctx, 'ho_so.xoa')

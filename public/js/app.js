@@ -4,7 +4,7 @@
 
 import { goiCanDangNhap as api, soVn, chu, $ } from './api.js';
 import { dungKhung, coQuyen, bao, cho } from './khung.js';
-import { LOP_TRANG_THAI, TEN_TRANG_THAI } from './hoso-chung.js';
+import { LOP_TRANG_THAI, TEN_TRANG_THAI, tongThoiLuong } from './hoso-chung.js';
 
 const NHAN_QUYEN = {
   '*': 'Toàn quyền',
@@ -61,12 +61,9 @@ const NHAN_QUYEN = {
 /* ---------- Ô số liệu ---------- */
 
 function veSoLieu(d) {
-  const gio = Math.floor(d.tong_thoi_luong / 60);
-  const phut = d.tong_thoi_luong % 60;
-
   const muc = [
     { so: soVn(d.tong_ho_so), ten: 'Hồ sơ chương trình' },
-    { so: gio ? `${soVn(gio)}g ${phut}p` : `${phut} phút`, ten: 'Tổng thời lượng' },
+    { so: tongThoiLuong(d.tong_thoi_luong_giay), ten: 'Tổng thời lượng' },
     { so: soVn(d.so_doi_tac), ten: 'Đối tác hợp tác' },
     {
       so: soVn(d.theo_trang_thai.CHO_DUYET),

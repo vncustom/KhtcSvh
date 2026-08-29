@@ -76,17 +76,38 @@ function soSanhAnToan_(a, b) {
   return khac === 0;
 }
 
+/**
+ * Bảng bỏ dấu, viết theo nhóm nguyên âm thay vì hai chuỗi song song.
+ * Cách cũ dễ lệch một ký tự mà không ai phát hiện: chữ "đ" từng bị đổi thành "y",
+ * làm hỏng cả tên đăng nhập lẫn việc nhận diện cột trong phiếu Excel.
+ */
+const NHOM_BO_DAU = {
+  a: 'àáạảãâầấậẩẫăằắặẳẵ',
+  e: 'èéẹẻẽêềếệểễ',
+  i: 'ìíịỉĩ',
+  o: 'òóọỏõôồốộổỗơờớợởỡ',
+  u: 'ùúụủũưừứựửữ',
+  y: 'ỳýỵỷỹ',
+  d: 'đ'
+};
+
+const BANG_BO_DAU = (function () {
+  const m = {};
+  Object.keys(NHOM_BO_DAU).forEach(function (dich) {
+    NHOM_BO_DAU[dich].split('').forEach(function (ky) { m[ky] = dich; });
+  });
+  return m;
+})();
+
 /** Bỏ dấu tiếng Việt và chuyển thành slug dùng cho username, mã danh mục. */
 function khongDau_(s) {
-  const nguon = 'àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ';
-  const dich  = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooooouuuuuuuuuuuyyyyyd';
-  let r = String(s).toLowerCase();
-  let out = '';
-  for (let i = 0; i < r.length; i++) {
-    const p = nguon.indexOf(r[i]);
-    out += p >= 0 ? dich[p] : r[i];
+  const chu = String(s == null ? '' : s).toLowerCase();
+  let ra = '';
+  for (let i = 0; i < chu.length; i++) {
+    const c = chu[i];
+    ra += BANG_BO_DAU[c] || c;
   }
-  return out.replace(/[^a-z0-9]+/g, '');
+  return ra.replace(/[^a-z0-9]+/g, '');
 }
 
 /** Che một phần địa chỉ email: patusrila@gmail.com ➜ pa*****la@gmail.com */

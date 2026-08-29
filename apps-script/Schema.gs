@@ -19,12 +19,15 @@ const SCHEMA = {
     'ngay_tao', 'ngay_cap_nhat', 'nguoi_cap_nhat'
   ],
 
+  // so_tap và thoi_luong_phut giữ lại cho dữ liệu cũ, không còn được ghi mới.
+  // Thời lượng nay tính bằng giây và nhập theo dạng mm:ss.
   HO_SO: [
     'ho_so_id', 'ten_chuong_trinh', 'don_vi_chu_quan_id', 'the_loai', 'kenh',
     'thoi_luong_phut', 'so_tap', 'ngay_phat_song', 'gio_phat_song',
     'ghi_chu_lich', 'mo_ta', 'trang_thai', 'nguoi_duyet', 'ngay_duyet',
     'ly_do_tra_lai', 'drive_folder_id',
-    'ngay_tao', 'nguoi_tao', 'ngay_cap_nhat', 'nguoi_cap_nhat'
+    'ngay_tao', 'nguoi_tao', 'ngay_cap_nhat', 'nguoi_cap_nhat',
+    'ma_don_vi', 'ten_file', 'thoi_luong_giay'
   ],
 
   HO_SO_DON_VI: [

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nhập hồ sơ từ Excel — Cổng hồ sơ KHTC</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<header class="thanh-dau">
+  <div class="thanh-dau-trong">
+    <div class="huy-hieu">HTV</div>
+    <div class="day">
+      <span class="ten-dai">Đài Phát thanh – Truyền hình TP. Hồ Chí Minh</span>
+      <span class="ten-ban">Ban Kế hoạch – Tài chính</span>
+    </div>
+    <nav class="menu" id="dieuHuong"></nav>
+    <div class="con-lai">
+      <div class="the-toi">
+        <div class="ten" id="tenNguoiDung">…</div>
+        <div class="vai" id="tenVaiTro"></div>
+      </div>
+      <button class="nut-thoat" id="nutThoat" type="button">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<main class="khung">
+
+  <a href="/ho-so" style="font-size:13.5px;text-decoration:none">← Quay lại danh sách</a>
+
+  <h1 style="margin:8px 0 4px;font-size:22px;font-weight:600;color:var(--navy-800)">
+    Nhập hồ sơ từ phiếu Excel
+  </h1>
+  <p style="margin:0 0 24px;font-size:14px;color:var(--chu-nhat);max-width:68ch">
+    Dùng đúng phiếu yêu cầu lưu file mà đơn vị gửi sang. Hệ thống đọc dòng tiêu đề để nhận
+    các cột, nên thứ tự cột không quan trọng. Cột <strong>LINK</strong> được hiểu là link video
+    và cột <strong>TÊN FILE</strong> là tên hiển thị của video.
+  </p>
+
+  <!-- Bước 1: chọn file -->
+  <section id="buocChon" class="the">
+    <h2>Chọn phiếu</h2>
+    <p class="mo-ta">Định dạng .xlsx, tối đa 300 dòng mỗi lần.</p>
+    <div class="vung-tha" id="vungTha">
+      <div style="font-size:32px;line-height:1">📋</div>
+      <div style="font-weight:500">Kéo phiếu Excel vào đây</div>
+      <div style="font-size:13px;color:var(--chu-mo)">hoặc bấm để chọn từ máy</div>
+    </div>
+    <div id="loiChon" class="thong-bao loi an" style="margin-top:14px"></div>
+  </section>
+
+  <!-- Bước 2: đối chiếu -->
+  <section id="buocXem" class="an">
+
+    <div class="the" style="margin-bottom:16px">
+      <h2>Đối chiếu trước khi tạo</h2>
+      <p class="mo-ta" id="tomTatDoc"></p>
+
+      <div class="luoi c2" style="align-items:start">
+        <div class="truong" style="margin:0">
+          <label for="fDonVi">Đơn vị chủ quản cho toàn bộ hồ sơ *</label>
+          <select class="o-nhap" id="fDonVi"></select>
+          <p class="goi-y" id="goiYDonVi"></p>
+        </div>
+        <div id="canhBaoChung"></div>
+      </div>
+    </div>
+
+    <div class="loc-nhanh" id="locDong"></div>
+
+    <div class="bang-bao">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:34px"><input type="checkbox" id="chonTatCa" checked aria-label="Chọn tất cả"></th>
+            <th>Dòng</th><th>Mã</th><th>Tên chương trình</th><th>Thể loại</th>
+            <th>Kênh</th><th>Phát sóng</th><th>Thời lượng</th><th>Tên file</th><th>Ghi chú</th>
+          </tr>
+        </thead>
+        <tbody id="bangDong"></tbody>
+      </table>
+    </div>
+
+    <div class="hang-nut" style="margin-top:18px">
+      <button class="nut nut-chinh" id="nutTao" type="button">Tạo hồ sơ</button>
+      <button class="nut nut-phu" id="nutChonLai" type="button">Chọn phiếu khác</button>
+    </div>
+  </section>
+
+  <!-- Bước 3: kết quả -->
+  <section id="buocXong" class="the an">
+    <h2>Đã nhập xong</h2>
+    <div id="ketQua"></div>
+    <div class="hang-nut" style="margin-top:16px">
+      <a class="nut nut-chinh" href="/ho-so" style="text-decoration:none">Xem danh sách hồ sơ</a>
+      <button class="nut nut-phu" id="nutNhapTiep" type="button">Nhập phiếu khác</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="chan">
+  © 2025–2026 Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Chí Minh (HTV)
+</footer>
+
+<script type="module" src="/js/nhap-excel.js"></script>
+</body>
+</html>

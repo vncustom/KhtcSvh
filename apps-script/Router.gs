@@ -189,7 +189,12 @@ const ACTIONS = {
   themLinkTep: themLinkTep_,
   capNhatTep: capNhatTep_,
   xoaTep: xoaTep_,
-  kiemTraLinkTep: kiemTraLinkTep_
+  kiemTraLinkTep: kiemTraLinkTep_,
+
+  /* ----- Nhập hồ sơ hàng loạt từ phiếu Excel ----- */
+
+  docFileExcel: docFileExcel_,
+  taoHangLoat: taoHangLoat_
 };
 
 /** Xác thực phiên đăng nhập từ token trong cookie. */

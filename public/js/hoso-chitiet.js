@@ -4,7 +4,7 @@
 
 import { goiCanDangNhap as api, soVn, gioVn, ngayVn, chu, $ } from './api.js';
 import { dungKhung, bao, cho } from './khung.js';
-import { LOP_TRANG_THAI, HANH_DONG, VAI_TRO_DOI_TAC, maHoSoTuUrl } from './hoso-chung.js';
+import { LOP_TRANG_THAI, HANH_DONG, VAI_TRO_DOI_TAC, maHoSoTuUrl, giaySangChu } from './hoso-chung.js';
 import { napTep } from './hoso-tep.js';
 
 const maHoSo = maHoSoTuUrl();
@@ -66,6 +66,7 @@ function ve(d) {
 
   veBang('bangTongQuan', [
     ['Mã hồ sơ', h.ho_so_id],
+    ['Mã của đơn vị', h.ma_don_vi || '—'],
     ['Đơn vị chủ quản', h.don_vi_chu_quan],
     ['Thể loại', tenDanhMuc('THE_LOAI', h.the_loai)],
     ['Người tạo', h.nguoi_tao],
@@ -77,8 +78,8 @@ function ve(d) {
 
   veBang('bangPhatSong', [
     ['Kênh phát sóng', tenDanhMuc('KENH', h.kenh)],
-    ['Thời lượng', h.thoi_luong_phut ? soVn(h.thoi_luong_phut) + ' phút' : '—'],
-    ['Số tập', h.so_tap ? soVn(h.so_tap) + ' tập' : '—'],
+    ['Thời lượng', h.thoi_luong_giay ? giaySangChu(h.thoi_luong_giay) : '—'],
+    ['Tên file', h.ten_file || '—'],
     ['Ngày phát sóng', h.ngay_phat_song ? ngayVn(h.ngay_phat_song) : '—'],
     ['Giờ phát sóng', h.gio_phat_song || '—'],
     ['Ghi chú lịch', h.ghi_chu_lich || '—']
@@ -152,9 +153,9 @@ function veThuMuc(h) {
     vung.append(a);
   } else {
     const p = document.createElement('div');
-    p.className = 'thong-bao canh-bao';
-    p.textContent = 'Chưa mở được thư mục Drive của hồ sơ này. '
-      + 'Kiểm tra lại thư mục gốc ở mục Quản trị ➜ Cấu hình.';
+    p.className = 'thong-bao';
+    p.style.cssText = 'background:var(--mat-2);border-color:var(--duong);color:var(--chu-nhat)';
+    p.textContent = 'Thư mục trên Drive sẽ được tạo khi tệp đầu tiên được tải lên.';
     vung.append(p);
   }
 }

@@ -39,6 +39,10 @@ const CAU_HINH_MAC_DINH = [
   ['SO_LAN_SAI_TOI_DA', '5', 'Số lần nhập sai trước khi khoá'],
   ['KHOA_PHUT', '15', 'Thời gian khoá sau khi nhập sai quá số lần cho phép'],
   ['TIEN_TO_MA_HO_SO', 'HTV-KHTC', 'Tiền tố của mã hồ sơ, ví dụ HTV-KHTC-2026-001'],
+  ['DON_VI_GUI_DUYET_HO', 'Trung tâm Phát hình - Tư liệu',
+    'Tên các đơn vị được gửi duyệt hộ hồ sơ của đơn vị khác, cách nhau bằng dấu chấm phẩy'],
+  ['DON_VI_CHU_QUAN_DUOC_DUYET', 'BAT',
+    'BAT cho phép đơn vị chủ quản tự duyệt hồ sơ của mình; TAT thì chỉ Ban KH-TC duyệt'],
   ['CHE_DO_KIEM_TRA', 'BAT', 'BAT cho phép trang kiểm tra Giai đoạn 0 chạy không cần đăng nhập. Đặt TAT khi chạy thật.'],
   ['QUOTA_MAIL_CANH_BAO', '20', 'Cảnh báo admin khi số email còn lại trong ngày thấp hơn mức này']
 ];

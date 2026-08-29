@@ -9,6 +9,7 @@ import { goi, dat, chu, $ } from './api.js';
 const MENU = [
   { duong_dan: '/app', ten: 'Bảng điều khiển', quyen: null },
   { duong_dan: '/ho-so', ten: 'Hồ sơ chương trình', quyen: null },
+  { duong_dan: '/nhap-excel', ten: 'Nhập từ Excel', quyen: 'ho_so.them' },
   { duong_dan: '/quan-tri', ten: 'Quản trị', quyen: 'nhat_ky.xem' }
 ];
 

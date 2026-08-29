@@ -11,6 +11,7 @@ import { goiCanDangNhap as api, gioVn, chu, $ } from './api.js';
 import { bao, cho } from './khung.js';
 
 const KHOI = 8 * 1024 * 1024;
+const NGUONG_MAC_DINH = 3 * 1024 * 1024;
 
 const BIEU_TUONG = {
   HOP_DONG: '📄', DOC: '📝', AUDIO: '🎵', IMAGE: '🖼️', VIDEO: '🎬'
@@ -229,9 +230,10 @@ function moHopThoaiTaiLen(tepList) {
   });
 }
 
-async function taiMotTep(tep, tuyChon, datTien) {
-  if (tep.size > trangThai.nguong_truc_tiep) {
-    return taiTheoPhien(tep, tuyChon, datTien);
+export async function taiMotTep(tep, tuyChon, datTien, hoSoId) {
+  const ho = hoSoId || maHoSo;
+  if (tep.size > (trangThai.nguong_truc_tiep || NGUONG_MAC_DINH)) {
+    return taiTheoPhien(tep, tuyChon, datTien, ho);
   }
 
   datTien(10);
@@ -239,7 +241,7 @@ async function taiMotTep(tep, tuyChon, datTien) {
   datTien(40);
 
   await api('taiLenTep', {
-    ho_so_id: maHoSo,
+    ho_so_id: ho,
     ten: tep.name,
     mime: tep.type || 'application/octet-stream',
     du_lieu: b64,
@@ -249,9 +251,10 @@ async function taiMotTep(tep, tuyChon, datTien) {
 }
 
 /** Tệp lớn: xin phiên rồi gửi từng khối thẳng tới Google. */
-async function taiTheoPhien(tep, tuyChon, datTien) {
+async function taiTheoPhien(tep, tuyChon, datTien, hoSoId) {
+  const ho = hoSoId || maHoSo;
   const phien = await api('moPhienTaiLen', {
-    ho_so_id: maHoSo,
+    ho_so_id: ho,
     ten: tep.name,
     mime: tep.type || 'application/octet-stream',
     kich_thuoc: tep.size,
@@ -297,7 +300,7 @@ async function taiTheoPhien(tep, tuyChon, datTien) {
 
   datTien(98);
   await api('hoanTatTaiLen', {
-    ho_so_id: maHoSo,
+    ho_so_id: ho,
     drive_file_id: ketQua.id,
     ...tuyChon
   });
@@ -508,7 +511,7 @@ function dongManChe(che) {
   che.remove();
 }
 
-function taoThanhTien(vung, ten) {
+export function taoThanhTien(vung, ten) {
   const khoi = document.createElement('div');
   khoi.style.marginBottom = '10px';
 

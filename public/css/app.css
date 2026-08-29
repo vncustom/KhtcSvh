@@ -766,3 +766,28 @@ a.thanh-do:hover .thanh-nhan span:first-child { color: var(--navy-700); }
   .tep-hang { flex-wrap: wrap; }
   .tep-hang .hang-nut { margin-left: 46px; width: 100%; }
 }
+
+/* ---------- Vùng thả file ---------- */
+
+.vung-tha {
+  border: 2px dashed var(--duong);
+  border-radius: var(--bo-goc);
+  padding: 34px 20px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--nen);
+  transition: border-color .15s, background .15s;
+}
+
+.vung-tha:hover { border-color: var(--navy-500); background: var(--mat-2); }
+
+.vung-tha.dang-keo {
+  border-color: var(--dong);
+  background: var(--canh-bao-nen);
+}
+
+.vung-tha.dang-doc { cursor: progress; border-style: solid; }

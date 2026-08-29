@@ -4,7 +4,7 @@ Ban Kế hoạch – Tài chính, Đài Phát thanh - Truyền hình TP. Hồ Ch
 
 Giao diện HTML thuần trên Vercel · API bằng Google Apps Script · dữ liệu trong Google Sheet · tài liệu trên Google Drive.
 
-**Trạng thái: Giai đoạn 3** — hồ sơ, quy trình duyệt và tệp đính kèm đã hoạt động. Hợp đồng và phiếu chia sẻ sẽ có ở Giai đoạn 4.
+**Trạng thái: Giai đoạn 3+** — hồ sơ, quy trình duyệt, tệp đính kèm và nhập hàng loạt từ Excel đã hoạt động. Hợp đồng và phiếu chia sẻ sẽ có ở Giai đoạn 4.
 
 ---
 
@@ -17,6 +17,7 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   ho-so.html          Danh sách hồ sơ: lọc, tìm kiếm, phân trang
   ho-so-chi-tiet.html Xem một hồ sơ và thực hiện các bước duyệt
   ho-so-sua.html      Biểu mẫu thêm và sửa hồ sơ
+  nhap-excel.html     Nhập nhiều hồ sơ từ phiếu Excel của đơn vị
   quan-tri.html       Người dùng · Đơn vị · Cấu hình · Nhật ký
   kiem-tra.html       Trang kiểm tra đường truyền của Giai đoạn 0
   css/app.css         Bảng màu navy và các thành phần dùng chung
@@ -25,6 +26,7 @@ public/            Giao diện — HTML, CSS, JS thuần, không có bước bi�
   js/hoso-chung.js    Hằng số và nhãn dùng chung cho ba trang hồ sơ
   js/dangnhap.js      js/app.js            js/quantri.js       js/kiemtra.js
   js/hoso-danhsach.js js/hoso-chitiet.js   js/hoso-sua.js      js/hoso-tep.js
+  js/nhap-excel.js
 
 api/               Tuyến trung gian chạy trên Vercel (Node)
   goi.js             Cửa chung cho mọi action nghiệp vụ
@@ -49,6 +51,7 @@ apps-script/       Mã chạy trên Google Apps Script
   Drive.gs           Cây thư mục lưu trữ của từng hồ sơ
   HoSo.gs            Hồ sơ chương trình và quy trình duyệt
   Tep.gs             Tệp đính kèm: tải lên, dán link, kiểm tra link
+  NhapExcel.gs       Đọc phiếu Excel và tạo hồ sơ hàng loạt
   Setup.gs           Khởi tạo bảng và dữ liệu mẫu
   Router.gs          Điểm vào doPost
 
@@ -65,7 +68,7 @@ scripts/           Máy chủ chạy thử trên máy, không cần Vercel CLI
 
 1. Mở [script.google.com](https://script.google.com) **bằng tài khoản Google có gói 5 TB** (tài khoản này sẽ sở hữu toàn bộ tệp Drive và hạn mức email).
 2. Bấm **Dự án mới**. Đặt tên: `HTV KHTC API`.
-3. Tạo đủ 15 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
+3. Tạo đủ 16 file trong dự án và dán nội dung tương ứng từ thư mục `apps-script/`.
    Trong trình soạn thảo, dấu `.gs` được thêm tự động — chỉ cần gõ tên `Schema`, `Config`, …
 4. Mở **Project Settings** ➜ tích **Show "appsscript.json" manifest file**, rồi dán nội dung
    `apps-script/appsscript.json` đè lên file manifest.
@@ -226,8 +229,15 @@ NHAP  ──gửi duyệt──▶  CHO_DUYET  ──duyệt──▶  DA_DUYET 
 
 | Bước | Ai làm được |
 |---|---|
-| Gửi duyệt | Đơn vị chủ quản, Ban KH-TC, Quản trị |
-| Duyệt · Trả lại · Lưu trữ · Mở lại | Ban KH-TC, Quản trị |
+| Gửi duyệt | Đơn vị chủ quản của hồ sơ · các đơn vị được gửi duyệt hộ · Ban KH-TC · Quản trị |
+| Duyệt · Trả lại · Lưu trữ · Mở lại | Đơn vị chủ quản của hồ sơ · Ban KH-TC · Quản trị |
+
+Hai dòng trên điều khiển bằng tham số ở **Quản trị ➜ Cấu hình**:
+
+| Tham số | Mặc định | Ý nghĩa |
+|---|---|---|
+| `DON_VI_GUI_DUYET_HO` | Trung tâm Phát hình - Tư liệu | Đơn vị được gửi duyệt hộ hồ sơ của đơn vị khác. Nhiều đơn vị thì ngăn bằng dấu chấm phẩy. |
+| `DON_VI_CHU_QUAN_DUOC_DUYET` | BAT | Cho đơn vị chủ quản tự duyệt hồ sơ của mình. Đặt `TAT` nếu muốn chỉ Ban KH-TC được duyệt. |
 
 Trả lại bắt buộc nhập lý do; lý do được gửi email cho đơn vị chủ quản và ghi vào nhật ký hồ sơ.
 
@@ -235,6 +245,39 @@ Trả lại bắt buộc nhập lý do; lý do được gửi email cho đơn v�
 báo trước điều này. Ban KH-TC sửa thì không, vì họ duyệt được ngay.
 
 Đối tác chỉ thấy hồ sơ **đã duyệt** và có gán đơn vị của mình.
+
+---
+
+## Nhập hồ sơ từ phiếu Excel
+
+Vào **Hồ sơ chương trình ➜ Nhập từ Excel**, hoặc mục **Nhập từ Excel** trên thanh điều hướng.
+
+Hệ thống đọc phiếu yêu cầu lưu file mà đơn vị gửi sang, đúng như mẫu đang dùng:
+
+| Cột trong phiếu | Vào trường |
+|---|---|
+| ID | Mã chương trình của đơn vị |
+| TÊN CHƯƠNG TRÌNH | Tên chương trình *(bắt buộc)* |
+| THỂ LOẠI | Thể loại |
+| NGÀY PHÁT SÓNG | Ngày phát sóng |
+| KÊNH PHÁT SÓNG | Kênh |
+| GIỜ PHÁT SÓNG | Giờ phát sóng |
+| THỜI LƯỢNG CT | Thời lượng *(bắt buộc)* |
+| NỘI DUNG ĐỀ NGHỊ | Nội dung chương trình |
+| TÊN FILE | Tên file, đồng thời là tên hiển thị của video |
+| LINK | Link video, tự tạo thành tệp đính kèm |
+
+Cột được nhận theo **tên ở dòng tiêu đề**, không theo thứ tự, và dòng tiêu đề được dò tự động
+nên phần đầu phiếu dài ngắn thế nào cũng được. Đơn vị chủ quản đọc từ dòng `ĐƠN VỊ: …`,
+vẫn sửa lại được trước khi tạo.
+
+Trước khi tạo, màn hình hiện toàn bộ dòng đọc được để đối chiếu, kèm cảnh báo cho dòng
+thiếu thời lượng hay có kênh lạ. Bỏ tích những dòng không muốn nhập.
+
+Hồ sơ nhập vào ở trạng thái **Nháp**. Mỗi lần tối đa 300 dòng, file tối đa 3 MB.
+
+Thời lượng nhập theo dạng **phút:giây** (`13:44`) — đúng như trong phiếu. Quá 60 phút
+thì viết `giờ:phút:giây`.
 
 ---
 
